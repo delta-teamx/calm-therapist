@@ -188,6 +188,7 @@ interface PrismaFeedbackRow {
   adminResponse: string | null;
   respondedAt: Date | null;
   createdAt: Date;
+  sessionId: string | null;
 }
 
 function rowToRecord(row: PrismaFeedbackRow): FeedbackRecord {
