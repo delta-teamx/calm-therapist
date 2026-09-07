@@ -1,138 +1,101 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Style } from "@/components/ui/Style";
 
-interface Goal {
-  id: string;
-  title: string;
-  description: string;
-  daysActive: number;
-  progress: number;
-  history: boolean[];
-}
+interface Goal { id: string; title: string; description?: string; frequency: "daily" | "3x-week" | "weekly"; week: { day: string; done: boolean }[]; progress: number; doneToday: boolean }
 
-const INITIAL: Goal[] = [
-  {
-    id: "g1",
-    title: "Sleep before midnight",
-    description: "Three nights this week.",
-    daysActive: 28,
-    progress: 2 / 3,
-    history: [true, true, false, true, true, true, false],
-  },
-  {
-    id: "g2",
-    title: "One real conversation a week",
-    description: "Not small talk. Something true.",
-    daysActive: 28,
-    progress: 1,
-    history: [false, true, true, true, true, false, true],
-  },
-  {
-    id: "g3",
-    title: "Walk after dinner",
-    description: "Four times this week.",
-    daysActive: 14,
-    progress: 1 / 4,
-    history: [false, false, true, false, false, false, false],
-  },
-];
+const FREQ_LABEL = { daily: "Every day", "3x-week": "Three times a week", weekly: "Once a week" };
 
 export default function GoalsPage() {
-  const [goals, setGoals] = useState(INITIAL);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [max, setMax] = useState(5);
+  const [loaded, setLoaded] = useState(false);
+  const [title, setTitle] = useState("");
+  const [frequency, setFrequency] = useState<Goal["frequency"]>("3x-week");
+  const [error, setError] = useState<string | null>(null);
 
-  const addGoal = () => {
-    if (goals.length >= 5) return;
-    setGoals([
-      ...goals,
-      { id: `g${goals.length + 1}`, title: "New goal", description: "", daysActive: 0, progress: 0, history: [] },
-    ]);
+  useEffect(() => {
+    fetch("/api/goals").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) { setGoals(d.goals ?? []); setMax(d.max ?? 5); } }).finally(() => setLoaded(true));
+  }, []);
+
+  const add = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    const res = await fetch("/api/goals", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, frequency }) });
+    const d = await res.json();
+    if (!res.ok) { setError(d.error ?? "Could not add that."); return; }
+    setGoals(d.goals);
+    setTitle("");
+  };
+  const toggle = async (id: string) => {
+    const res = await fetch(`/api/goals/${id}`, { method: "PATCH" });
+    if (res.ok) setGoals((await res.json()).goals);
+  };
+  const remove = async (id: string) => {
+    if (!window.confirm("Let this goal go?")) return;
+    const res = await fetch(`/api/goals/${id}`, { method: "DELETE" });
+    if (res.ok) setGoals((await res.json()).goals);
   };
 
   return (
     <div style={{ padding: "48px 32px", maxWidth: 880, margin: "0 auto" }}>
-      <h2 style={{ marginBottom: 8 }}>Goals</h2>
-      <p className="body-large" style={{ color: "var(--calm-ink-40)", marginBottom: 32 }}>
-        Small, specific, and yours.
-      </p>
+      <h2 style={{ marginBottom: 8 }}>What you&apos;re after</h2>
+      <p className="body-large" style={{ color: "var(--calm-ink-40)", marginBottom: 32 }}>Small, specific, and yours. Tick the day it happened.</p>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 32 }}>
+        {loaded && goals.length === 0 && (
+          <div className="card-mist"><p style={{ fontSize: 15, lineHeight: 1.7 }}>No goals yet. The best first one is tiny: something you could do tomorrow, tied to something you care about.</p></div>
+        )}
         {goals.map((g) => (
-          <GoalCard key={g.id} goal={g} />
+          <div key={g.id} className="card goal-card">
+            <Ring progress={g.progress} />
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <h4 style={{ marginBottom: 4 }}>{g.title}</h4>
+              <p style={{ fontSize: 13, color: "var(--calm-ink-40)" }}>{FREQ_LABEL[g.frequency]}{g.description ? ` · ${g.description}` : ""}</p>
+              <div className="week-dots" aria-label="Last seven days">
+                {g.week.map((w) => <span key={w.day} data-done={w.done ? "true" : "false"} title={w.day} />)}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button type="button" className={g.doneToday ? "btn-primary" : "btn-ghost"} style={{ height: 36, fontSize: 13 }} onClick={() => toggle(g.id)}>
+                {g.doneToday ? "Done today" : "Did it today"}
+              </button>
+              <button type="button" className="btn-ghost" style={{ height: 36, fontSize: 13, color: "var(--calm-ink-40)" }} onClick={() => remove(g.id)} aria-label="Remove goal">×</button>
+            </div>
+          </div>
         ))}
       </div>
 
-      {goals.length < 5 && (
-        <button onClick={addGoal} className="btn-ghost" style={{ marginBottom: 32 }}>
-          + Add a goal ({goals.length}/5)
-        </button>
+      {goals.length < max && (
+        <form onSubmit={add} className="card" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Walk after dinner" maxLength={120} style={{ flex: 1, minWidth: 220 }} required />
+          <select className="input" value={frequency} onChange={(e) => setFrequency(e.target.value as Goal["frequency"])} style={{ width: 190 }}>
+            <option value="daily">Every day</option>
+            <option value="3x-week">Three times a week</option>
+            <option value="weekly">Once a week</option>
+          </select>
+          <button type="submit" className="btn-primary" style={{ height: 44 }}>Add ({goals.length}/{max})</button>
+          {error && <p style={{ fontSize: 13, color: "var(--calm-ink)", width: "100%" }}>{error}</p>}
+        </form>
       )}
 
-      <div className="card-mist">
-        <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 16 }}>
-          Calm Therapist&apos;s read on your goals
-        </p>
-        <p style={{ fontSize: 16, lineHeight: 1.8 }}>
-          You&apos;re ahead on conversations and behind on sleep. That&apos;s not a failure — that&apos;s
-          a pattern worth noticing. Your sleep tracks closely with your evening walks. If walking
-          isn&apos;t happening, sleep isn&apos;t happening. Maybe the goal isn&apos;t sleep at all —
-          maybe it&apos;s the walk.
-        </p>
-      </div>
+      <Style>{`
+        .goal-card { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .week-dots { display: flex; gap: 6px; margin-top: 10px; }
+        .week-dots span { width: 12px; height: 12px; border-radius: 999px; background: var(--calm-ink-10); }
+        .week-dots span[data-done="true"] { background: var(--calm-forest); }
+      `}</Style>
     </div>
   );
 }
 
-function GoalCard({ goal }: { goal: Goal }) {
+function Ring({ progress }: { progress: number }) {
   const dash = 2 * Math.PI * 22;
-  const offset = dash * (1 - goal.progress);
   return (
-    <div className="card" style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
-      <svg width="60" height="60" viewBox="0 0 60 60">
-        <circle cx="30" cy="30" r="22" fill="none" stroke="var(--calm-ink-10)" strokeWidth="4" />
-        <circle
-          cx="30"
-          cy="30"
-          r="22"
-          fill="none"
-          stroke="var(--calm-forest)"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeDasharray={dash}
-          strokeDashoffset={offset}
-          transform="rotate(-90 30 30)"
-          style={{ transition: "stroke-dashoffset 0.6s ease" }}
-        />
-        <text
-          x="30"
-          y="34"
-          textAnchor="middle"
-          fill="var(--calm-ink)"
-          style={{ fontFamily: "var(--font-heading)", fontSize: 14 }}
-        >
-          {Math.round(goal.progress * 100)}%
-        </text>
-      </svg>
-      <div style={{ flex: 1, minWidth: 200 }}>
-        <h4>{goal.title}</h4>
-        <p style={{ fontSize: 14, color: "var(--calm-ink-40)", marginTop: 4 }}>{goal.description}</p>
-        <div style={{ display: "flex", gap: 4, marginTop: 12 }}>
-          {goal.history.map((done, i) => (
-            <span
-              key={i}
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: 999,
-                background: done ? "var(--calm-forest)" : "var(--calm-ink-10)",
-              }}
-            />
-          ))}
-        </div>
-      </div>
-      <div style={{ fontSize: 13, color: "var(--calm-ink-40)", textAlign: "right" }}>
-        {goal.daysActive} days active
-      </div>
-    </div>
+    <svg width="60" height="60" viewBox="0 0 60 60" aria-hidden>
+      <circle cx="30" cy="30" r="22" fill="none" stroke="var(--calm-ink-10)" strokeWidth="4" />
+      <circle cx="30" cy="30" r="22" fill="none" stroke="var(--calm-forest)" strokeWidth="4" strokeDasharray={dash} strokeDashoffset={dash * (1 - progress)} strokeLinecap="round" transform="rotate(-90 30 30)" />
+    </svg>
   );
 }

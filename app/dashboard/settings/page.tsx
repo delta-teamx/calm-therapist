@@ -45,6 +45,17 @@ export default function SettingsPage() {
         if (data.user) setEmailOptOut(data.user.emailOptOut);
       })
       .catch(() => {});
+    fetch("/api/users/me/profile")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { profile?: { language?: string; tone?: string; crisisContactName?: string; crisisContactPhone?: string } } | null) => {
+        const p = d?.profile;
+        if (!p) return;
+        if (p.language) setLanguage(p.language);
+        if (p.tone) setTone(p.tone as typeof tone);
+        if (p.crisisContactName) setCrisisName(p.crisisContactName);
+        if (p.crisisContactPhone) setCrisisPhone(p.crisisContactPhone);
+      })
+      .catch(() => {});
   }, []);
 
   const save = async () => {
@@ -54,7 +65,7 @@ export default function SettingsPage() {
       const res = await fetch("/api/users/me/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ language, tone, emailOptOut }),
+        body: JSON.stringify({ language, tone, emailOptOut, crisisContactName: crisisName, crisisContactPhone: crisisPhone }),
       });
       setSaved(res.ok ? "Saved." : "Saved on this device. Could not reach the server.");
     } catch {

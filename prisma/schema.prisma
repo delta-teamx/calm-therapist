@@ -27,6 +27,10 @@ model User {
   // First-touch attribution captured at signup (landing path, external referrer).
   signupLanding      String?
   signupReferrer     String?
+  // Someone the member would want Aura to name in a hard moment. Stored on the
+  // server so it follows them across devices.
+  crisisContactName  String?
+  crisisContactPhone String?
   // Email preferences
   emailOptOut        Boolean        @default(false)
   unsubscribeToken   String?        @unique
@@ -62,6 +66,7 @@ model User {
   voiceQuota     VoiceQuota?
   crisisEvents   CrisisEvent[]
   circleInterests CircleInterest[]
+  moodEntries    MoodEntry[]
   voiceSessions  VoiceSession[]
 
   @@index([createdAt])
@@ -280,4 +285,19 @@ model CircleInterest {
 
   @@unique([userId, theme])
   @@index([theme])
+}
+
+/// One tap a day: how the member is arriving. Drives the journal week row
+/// and the profile trend; never shown to anyone else.
+model MoodEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  day       DateTime @db.Date
+  score     Int
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, day])
+  @@index([userId, day])
 }

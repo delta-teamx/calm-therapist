@@ -1,230 +1,171 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { loadMemories, MemoryNode } from "@/lib/memory";
-import { readState } from "@/components/onboarding/OnboardingShell";
+import { Style } from "@/components/ui/Style";
 
-const SESSION_HISTORY = [
-  { date: "Apr 26", mode: "Voice", duration: "22 min", summary: "The same argument with your wife came up. You stayed, this time." },
-  { date: "Apr 24", mode: "Chat", duration: "18 min", summary: "Sleep is improving on the nights you walk." },
-  { date: "Apr 22", mode: "Voice", duration: "31 min", summary: "Tuesdays again. You named the trigger more directly." },
-  { date: "Apr 19", mode: "Chat", duration: "14 min", summary: "Your sister called. You let her finish before responding." },
-  { date: "Apr 16", mode: "Voice", duration: "27 min", summary: "Work is loud. You haven't spoken to your manager." },
-  { date: "Apr 14", mode: "Journal", duration: "—", summary: "Wrote about your father for the first time in three weeks." },
-];
-
-const MOOD_DATA = [3, 2, 3, 4, 2, 3, 3, 4, 3, 2, 4, 4, 3, 4, 4, 3, 3, 4, 4, 4, 3, 4, 4, 3, 4, 4, 4, 3, 4, 4];
+interface Memory { id: string; statement: string; category: string; mentions: number; firstMentioned: string; lastMentioned: string }
+interface Profile { name: string; age?: string; tone: string; language: string; focusAreas: string[]; countryOfResidence?: string }
+interface SessionRow { id: string; mode: "chat" | "voice"; startedAt: string; endedAt?: string; summary?: string; turns: number }
+interface Mood { day: string; score: number }
 
 export default function ProfilePage() {
-  const [name, setName] = useState("friend");
-  const [age, setAge] = useState("—");
-  const [tone, setTone] = useState("warm");
-  const [language, setLanguage] = useState("en");
-  const [memories, setMemories] = useState<MemoryNode[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [memories, setMemories] = useState<Memory[]>([]);
+  const [sessions, setSessions] = useState<SessionRow[]>([]);
+  const [moods, setMoods] = useState<Mood[]>([]);
+  const [memberSince, setMemberSince] = useState<string>("");
+  const [memberNumber, setMemberNumber] = useState<number | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    const s = readState() as Record<string, string>;
-    if (s.name) setName(s.name);
-    if (s.age) setAge(s.age);
-    if (s.tone) setTone(s.tone);
-    if (s.language) setLanguage(s.language);
-    setMemories(loadMemories());
+    fetch("/api/users/me/profile").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.profile) { setProfile(d.profile); setMemories(d.memories ?? []); } }).catch(() => {});
+    fetch("/api/sessions?limit=20").then((r) => (r.ok ? r.json() : null)).then((d) => d && setSessions(d.sessions ?? [])).catch(() => {});
+    fetch("/api/mood?days=30").then((r) => (r.ok ? r.json() : null)).then((d) => d && setMoods(d.moods ?? [])).catch(() => {});
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => {
+      if (d.user?.createdAt) setMemberSince(new Date(d.user.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" }));
+      if (typeof d.user?.memberNumber === "number") setMemberNumber(d.user.memberNumber);
+    }).catch(() => {});
   }, []);
+
+  const forget = async (id: string) => {
+    const res = await fetch(`/api/users/me/memories/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      const d = await res.json();
+      setMemories(d.memories ?? memories.filter((m) => m.id !== id));
+      setNotice("Forgotten.");
+    }
+  };
+
+  const exportData = async () => {
+    setNotice("Preparing your record…");
+    const res = await fetch("/api/users/me/export");
+    if (!res.ok) { setNotice("Could not prepare the export. Try again in a moment."); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `my-record-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setNotice("Downloaded.");
+  };
+
+  const avg = moods.length ? (moods.reduce((s, m) => s + m.score, 0) / moods.length).toFixed(1) : null;
 
   return (
     <div style={{ padding: "48px 32px", maxWidth: 980, margin: "0 auto" }}>
-      <h2 style={{ marginBottom: 32 }}>Your profile</h2>
+      <h2 style={{ marginBottom: 32 }}>Your space</h2>
 
       <div className="card" style={{ marginBottom: 32 }}>
-        <ProfileRow label="Name" value={name} />
-        <ProfileRow label="Age" value={age} />
-        <ProfileRow label="Tone" value={capitalize(tone)} />
-        <ProfileRow label="Language" value={languageLabel(language)} />
-        <ProfileRow label="Member since" value="February 2026" last />
+        <Row label="Name" value={profile?.name ?? "…"} />
+        <Row label="Age" value={profile?.age ?? "—"} />
+        <Row label="Tone" value={profile ? capitalize(profile.tone) : "…"} />
+        <Row label="Language" value={profile ? languageLabel(profile.language) : "…"} />
+        <Row label="Focus" value={profile?.focusAreas.length ? profile.focusAreas.join(", ") : "—"} />
+        <Row label="Member" value={memberNumber ? `#${memberNumber}${memberSince ? ` · since ${memberSince}` : ""}` : memberSince || "…"} last />
+        <Link href="/dashboard/settings" style={{ display: "inline-block", marginTop: 16, fontSize: 14, color: "var(--calm-forest)" }}>Change these in Preferences →</Link>
       </div>
 
       <div className="card-mist" style={{ marginBottom: 32 }}>
-        <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 16 }}>
-          What Calm Therapist knows about you
+        <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 6 }}>What Aura remembers</p>
+        <p style={{ fontSize: 14, color: "var(--calm-ink-40)", marginBottom: 16 }}>
+          Written by Aura after conversations, in plain words. Remove anything you would rather she did not carry.
         </p>
-        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
-          {memories.map((m) => (
-            <li
-              key={m.id}
-              style={{
-                background: "var(--calm-white)",
-                border: "1px solid var(--calm-ink-10)",
-                padding: "14px 18px",
-                borderRadius: 10,
-                fontSize: 15,
-                lineHeight: 1.6,
-                display: "flex",
-                justifyContent: "space-between",
-                gap: 16,
-                flexWrap: "wrap",
-              }}
-            >
-              <span>{m.statement}</span>
-              <span style={{ fontSize: 12, color: "var(--calm-ink-40)" }}>
-                {m.mentions} {m.mentions === 1 ? "mention" : "mentions"} · {m.category}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {memories.length === 0 ? (
+          <p style={{ fontSize: 15, color: "var(--calm-ink-70)" }}>Nothing yet. After a real conversation, Aura writes one to three lines here.</p>
+        ) : (
+          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+            {memories.map((m) => (
+              <li key={m.id} className="mem-row">
+                <div>
+                  <p style={{ fontSize: 15, lineHeight: 1.6 }}>{m.statement}</p>
+                  <p style={{ fontSize: 12, color: "var(--calm-ink-40)", marginTop: 4 }}>
+                    {m.category}{m.mentions > 1 ? ` · came up ${m.mentions} times` : ""} · first {new Date(m.firstMentioned).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                  </p>
+                </div>
+                <button type="button" className="btn-ghost" style={{ height: 32, fontSize: 12 }} onClick={() => forget(m.id)}>Forget</button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      <div className="card" style={{ marginBottom: 32 }}>
-        <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 16 }}>
-          Your emotional timeline · 30 days
-        </p>
-        <MoodGraph data={MOOD_DATA} />
-      </div>
-
-      <div className="card" style={{ marginBottom: 32 }}>
-        <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 16 }}>
-          Session history
-        </p>
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {SESSION_HISTORY.map((s, i) => (
-            <li
-              key={i}
-              style={{
-                display: "flex",
-                gap: 16,
-                padding: "14px 0",
-                borderBottom:
-                  i < SESSION_HISTORY.length - 1 ? "1px solid var(--calm-ink-10)" : "none",
-                flexWrap: "wrap",
-              }}
-            >
-              <span style={{ fontSize: 13, color: "var(--calm-ink-40)", minWidth: 70 }}>{s.date}</span>
-              <span className="body-micro" style={{ color: "var(--calm-forest)", minWidth: 70 }}>
-                {s.mode}
-              </span>
-              <span style={{ fontSize: 13, color: "var(--calm-ink-40)", minWidth: 60 }}>{s.duration}</span>
-              <span style={{ fontSize: 14, flex: 1, minWidth: 240 }}>{s.summary}</span>
-            </li>
-          ))}
-        </ul>
+      <div className="dash-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 32 }}>
+        <div className="card">
+          <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 16 }}>Last 30 days</p>
+          {moods.length === 0 ? (
+            <p style={{ fontSize: 15, color: "var(--calm-ink-70)" }}>No check-ins yet. The one tap on your Today page builds this.</p>
+          ) : (
+            <>
+              <div className="mood-bars" role="img" aria-label={`${moods.length} check-ins, average ${avg} out of 5`}>
+                {moods.map((m) => (
+                  <span key={m.day} title={`${m.day}: ${m.score}/5`} style={{ height: `${m.score * 20}%` }} data-score={m.score} />
+                ))}
+              </div>
+              <p style={{ fontSize: 13, color: "var(--calm-ink-40)", marginTop: 10 }}>{moods.length} check-ins · average {avg} of 5</p>
+            </>
+          )}
+        </div>
+        <div className="card">
+          <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 16 }}>Your record</p>
+          <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--calm-ink-70)" }}>
+            Everything here is yours. Download it as a file, or delete the account and all of it from Preferences.
+          </p>
+          <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
+            <button type="button" className="btn-ghost" onClick={exportData}>Download my record</button>
+            <Link href="/dashboard/settings#delete" className="btn-ghost" style={{ color: "var(--calm-ink)" }}>Delete account</Link>
+          </div>
+          {notice && <p style={{ fontSize: 13, color: "var(--calm-forest)", marginTop: 10 }}>{notice}</p>}
+        </div>
       </div>
 
       <div className="card">
-        <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 8 }}>
-          Your data
-        </p>
-        <p style={{ fontSize: 14, color: "var(--calm-ink-70)", marginBottom: 16 }}>
-          Spreadsheet-friendly. Opens in Excel, Numbers, Google Sheets — anything.
-        </p>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <button className="btn-primary" onClick={() => downloadCsv(memories)}>
-            Download my data (CSV)
-          </button>
-          <button className="btn-ghost" style={{ color: "var(--calm-ink)" }} onClick={confirmDelete}>
-            Delete all my data
-          </button>
-        </div>
+        <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 16 }}>Conversations</p>
+        {sessions.length === 0 ? (
+          <p style={{ fontSize: 15, color: "var(--calm-ink-70)" }}>None yet. <Link href="/dashboard/session" style={{ color: "var(--calm-forest)" }}>Talk to Aura →</Link></p>
+        ) : (
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {sessions.map((s) => (
+              <li key={s.id} className="sess-row">
+                <div style={{ minWidth: 96 }}>
+                  <p style={{ fontSize: 13, color: "var(--calm-ink-40)" }}>{new Date(s.startedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p>
+                  <p className="body-micro" style={{ color: "var(--calm-forest)" }}>{s.mode === "voice" ? "Voice" : "Chat"} · {s.turns} turns</p>
+                </div>
+                <p style={{ fontSize: 15, flex: 1, minWidth: 220, color: s.summary ? "var(--calm-ink)" : "var(--calm-ink-40)" }}>
+                  {s.summary ?? (s.endedAt ? "No note for this one." : "Still open.")}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
+
+      <Style>{`
+        .mem-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; background: var(--calm-white); border: 1px solid var(--calm-ink-10); padding: 12px 16px; border-radius: 10px; }
+        .sess-row { padding: 14px 0; border-bottom: 1px solid var(--calm-ink-10); display: flex; gap: 16px; flex-wrap: wrap; }
+        .sess-row:last-child { border-bottom: 0; }
+        .mood-bars { display: flex; align-items: flex-end; gap: 3px; height: 64px; }
+        .mood-bars span { flex: 1; min-width: 4px; border-radius: 3px 3px 0 0; background: var(--calm-forest-20); }
+        .mood-bars span[data-score="4"], .mood-bars span[data-score="5"] { background: var(--calm-forest); }
+        .mood-bars span[data-score="1"], .mood-bars span[data-score="2"] { background: var(--calm-ink-40); }
+        @media (max-width: 760px) { .dash-grid { grid-template-columns: 1fr !important; } }
+      `}</Style>
     </div>
   );
 }
 
-function csvEscape(value: string | number | null | undefined): string {
-  if (value === null || value === undefined) return "";
-  const s = String(value);
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
-  return s;
-}
-
-function downloadCsv(memories: { statement: string; category: string; mentions: number; firstMentioned: string; lastMentioned: string }[]) {
-  const rows: string[][] = [];
-
-  rows.push(["Section", "Type", "Detail", "Mentions", "First", "Last"]);
-  memories.forEach((m) => {
-    rows.push(["Memory", m.category, m.statement, String(m.mentions), m.firstMentioned, m.lastMentioned]);
-  });
-  // Blank separator row
-  rows.push([""]);
-  rows.push(["Section", "Date", "Mode", "Duration", "Summary"]);
-  SESSION_HISTORY.forEach((s) => {
-    rows.push(["Session", s.date, s.mode, s.duration, s.summary]);
-  });
-
-  const csv = rows.map((r) => r.map(csvEscape).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `calm-therapist-export-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function confirmDelete() {
-  if (typeof window === "undefined") return;
-  const ok = window.confirm("Delete everything? This wipes your local memories, mood data, and onboarding state on this device. It cannot be undone.");
-  if (!ok) return;
-  try {
-    Object.keys(window.localStorage)
-      .filter((k) => k.startsWith("calm-therapist:"))
-      .forEach((k) => window.localStorage.removeItem(k));
-    Object.keys(window.sessionStorage)
-      .filter((k) => k.startsWith("calm-therapist:"))
-      .forEach((k) => window.sessionStorage.removeItem(k));
-  } catch {}
-  window.alert("Cleared. The page will reload.");
-  window.location.reload();
-}
-
-function ProfileRow({ label, value, last }: { label: string; value: string; last?: boolean }) {
+function Row({ label, value, last }: { label: string; value: string; last?: boolean }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "14px 0",
-        borderBottom: last ? "none" : "1px solid var(--calm-ink-10)",
-        gap: 24,
-      }}
-    >
-      <span className="body-micro" style={{ color: "var(--calm-ink-40)" }}>{label}</span>
-      <span style={{ fontSize: 14 }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 16, padding: "12px 0", borderBottom: last ? "none" : "1px solid var(--calm-ink-10)", flexWrap: "wrap" }}>
+      <span style={{ fontSize: 14, color: "var(--calm-ink-40)" }}>{label}</span>
+      <span style={{ fontSize: 15, textAlign: "right" }}>{value}</span>
     </div>
   );
 }
-
-function MoodGraph({ data }: { data: number[] }) {
-  const w = 800;
-  const h = 140;
-  const max = 5;
-  const min = 1;
-  const points = data
-    .map((v, i) => {
-      const x = (i / (data.length - 1)) * w;
-      const y = h - ((v - min) / (max - min)) * h;
-      return `${x},${y}`;
-    })
-    .join(" ");
-
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height="140" preserveAspectRatio="none">
-      <polyline
-        fill="none"
-        stroke="var(--calm-forest)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        points={points}
-      />
-    </svg>
-  );
-}
-
-function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
+function capitalize(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
 function languageLabel(code: string) {
-  return ({ en: "English", es: "Spanish", fr: "French" } as Record<string, string>)[code] ?? code;
+  return { en: "English", ur: "Urdu", hi: "Hindi", ar: "Arabic", es: "Spanish", fr: "French" }[code] ?? code;
 }

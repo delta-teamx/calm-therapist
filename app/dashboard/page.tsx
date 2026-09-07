@@ -33,6 +33,14 @@ export default function DashboardHome() {
         if (d.user?.name && !s.name) setName(d.user.name);
       })
       .catch(() => {});
+    fetch("/api/mood?days=1")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { moods?: { day: string; score: number }[] } | null) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const t = d?.moods?.find((m) => m.day === today);
+        if (t) setMood(t.score);
+      })
+      .catch(() => {});
     fetch("/api/founding")
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { members?: number } | null) => {
@@ -110,7 +118,10 @@ export default function DashboardHome() {
           {[1, 2, 3, 4, 5].map((n) => (
             <button
               key={n}
-              onClick={() => setMood(n)}
+              onClick={() => {
+                setMood(n);
+                fetch("/api/mood", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ score: n }) }).catch(() => {});
+              }}
               style={{
                 width: 56,
                 height: 56,

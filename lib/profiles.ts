@@ -103,6 +103,8 @@ export async function getProfile(userId: string): Promise<StoredProfile | null> 
       stigmaContext: u.stigmaContext ?? undefined,
       somaticExpression: u.somaticExpression ?? undefined,
       emailOptOut: u.emailOptOut,
+      crisisContactName: u.crisisContactName ?? undefined,
+      crisisContactPhone: u.crisisContactPhone ?? undefined,
     };
   }
   const row = store.get(userId);
@@ -127,21 +129,18 @@ export async function getProfile(userId: string): Promise<StoredProfile | null> 
 
 export async function saveProfile(userId: string, patch: Partial<StoredProfile>): Promise<void> {
   if (dbEnabled) {
-    const { goals, crisisContactName, crisisContactPhone, age, ...rest } = patch;
+    const { goals, age, ...rest } = patch;
     await prisma.user.update({
       where: { id: userId },
       data: { ...rest, ...(age !== undefined ? { ageGroup: age } : {}) },
     });
-    if (goals) {
-      // Replace the goal list wholesale; goals are short titles from onboarding.
-      await prisma.goal.deleteMany({ where: { userId } });
-      if (goals.length) {
-        await prisma.goal.createMany({ data: goals.map((title) => ({ userId, title, frequency: "weekly" })) });
-      }
+    if (goals?.length) {
+      // Onboarding goals are added, never replace what the member already tracks.
+      const existing = await prisma.goal.findMany({ where: { userId }, select: { title: true } });
+      const have = new Set(existing.map((x) => x.title.toLowerCase()));
+      const fresh = goals.filter((t) => !have.has(t.toLowerCase())).slice(0, Math.max(0, 5 - existing.length));
+      if (fresh.length) await prisma.goal.createMany({ data: fresh.map((title) => ({ userId, title, frequency: "weekly" })) });
     }
-    // Crisis contact stays on the device only; it is never stored server-side.
-    void crisisContactName;
-    void crisisContactPhone;
     return;
   }
   const cur = store.get(userId) ?? { memories: [] };
