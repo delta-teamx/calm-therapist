@@ -1,6 +1,7 @@
-# Netlify: the whole app in one place. Pages and API routes run on the
-# Next.js runtime, the database is Netlify DB, and the email queue is
-# drained by the scheduled function in netlify/functions.
+# Netlify serves the public site. Everything that needs the backend
+# (API routes, dashboard, auth, onboarding, admin) is proxied to the Render
+# service below at status 200, so the browser sees one origin and cookies
+# stay first-party. Replace the Render URL once your service has its address.
 [build]
   command = "npm run build"
   publish = ".next"
@@ -11,5 +12,45 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-[functions]
-  directory = "netlify/functions"
+# --- Backend proxy to Render (order matters; first match wins) ---
+[[redirects]]
+  from = "/api/*"
+  to = "https://calm-therapist.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/dashboard/*"
+  to = "https://calm-therapist.onrender.com/dashboard/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/dashboard"
+  to = "https://calm-therapist.onrender.com/dashboard"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/auth/*"
+  to = "https://calm-therapist.onrender.com/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/onboarding/*"
+  to = "https://calm-therapist.onrender.com/onboarding/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/admin/*"
+  to = "https://calm-therapist.onrender.com/admin/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/admin"
+  to = "https://calm-therapist.onrender.com/admin"
+  status = 200
+  force = true

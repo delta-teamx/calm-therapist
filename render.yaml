@@ -1,5 +1,7 @@
-# Render blueprint: the whole app in one place.
-# Web service (Next.js, pages + API routes), Postgres, and the email cron.
+# Render blueprint: the backend. The same Next.js app, run as a Node web
+# service for the API routes, dashboard, auth, and admin. Netlify proxies
+# those paths here. Data lives in Supabase; the email queue is drained by
+# the cron job below.
 # Import at dashboard.render.com > Blueprints > New Blueprint Instance.
 services:
   - type: web
@@ -14,16 +16,25 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
-      - key: DATABASE_URL
-        fromDatabase:
-          name: calm-therapist-db
-          property: connectionString
       - key: AUTH_SECRET
         generateValue: true
       - key: CRON_SECRET
         generateValue: true
-      # Fill these in the dashboard after the first deploy.
+      - key: AURA_MODEL
+        value: gpt-5.4-mini
+      - key: AURA_REASONING
+        value: low
+      # Supabase: pooled URL for the app, direct URL for migrations.
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_DIRECT_URL
+        sync: false
+      # The public site address (Netlify or your domain), used in emails and links.
       - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: COOKIE_DOMAIN
         sync: false
       - key: ADMIN_EMAIL
         sync: false
@@ -31,8 +42,6 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
-      - key: AURA_MODEL
-        value: gpt-5.4-mini
       - key: ELEVENLABS_API_KEY
         sync: false
       - key: NEXT_PUBLIC_ELEVENLABS_AGENT_ID
@@ -50,7 +59,7 @@ services:
       - key: NEXT_PUBLIC_KOFI_URL
         sync: false
 
-  # Sends queued lifecycle emails every five minutes.
+  # Drains the lifecycle email queue every five minutes.
   - type: cron
     name: calm-therapist-emails
     runtime: node
@@ -61,21 +70,10 @@ services:
     startCommand: >-
       curl -fsS -X POST
       -H "x-cron-secret: $CRON_SECRET"
-      "$NEXT_PUBLIC_APP_URL/api/cron/emails"
+      "https://calm-therapist.onrender.com/api/cron/emails"
     envVars:
       - key: CRON_SECRET
         fromService:
           type: web
           name: calm-therapist
           envVarKey: CRON_SECRET
-      - key: NEXT_PUBLIC_APP_URL
-        fromService:
-          type: web
-          name: calm-therapist
-          envVarKey: NEXT_PUBLIC_APP_URL
-
-databases:
-  - name: calm-therapist-db
-    plan: basic-256mb
-    region: frankfurt
-    postgresMajorVersion: "16"
