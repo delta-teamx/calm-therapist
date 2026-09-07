@@ -5,6 +5,8 @@ import { getUserById } from "@/lib/users";
 import { accessFor } from "@/lib/access";
 import { closeVoiceSession, getVoiceQuotaSnapshot } from "@/lib/voice-quota";
 import { agentId, getConversation } from "@/lib/elevenlabs";
+import { recordVoiceSession, type Turn } from "@/lib/sessions";
+import { summariseSession } from "@/lib/reflection";
 
 export const runtime = "nodejs";
 
@@ -19,7 +21,7 @@ export async function POST(req: Request) {
   const user = await getUserById(claims.sub);
   if (!user) return NextResponse.json({ error: "Account not found" }, { status: 404 });
 
-  let body: { sessionId?: string; conversationId?: string };
+  let body: { sessionId?: string; conversationId?: string; transcript?: unknown; startedAt?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -28,6 +30,25 @@ export async function POST(req: Request) {
   const sessionId = typeof body.sessionId === "string" ? body.sessionId.slice(0, 64) : "";
   const conversationId = typeof body.conversationId === "string" ? body.conversationId.slice(0, 128) : "";
   if (!sessionId || !conversationId) return NextResponse.json({ error: "Missing ids" }, { status: 400 });
+
+  // The transcript is saved first and exactly once per conversation, so the
+  // beacon and the fetch that both fire on disconnect do not double it.
+  const turns: Turn[] = Array.isArray(body.transcript)
+    ? (body.transcript as unknown[])
+        .filter((t): t is { role: string; content: string; at?: string } => !!t && typeof t === "object" && typeof (t as { content?: unknown }).content === "string")
+        .map((t) => ({ role: t.role === "assistant" ? "assistant" : "user", content: t.content, at: typeof t.at === "string" ? t.at : new Date().toISOString() }))
+    : [];
+  if (turns.length) {
+    try {
+      const saved = await recordVoiceSession(user.id, turns, {
+        externalId: conversationId,
+        startedAt: typeof body.startedAt === "string" ? body.startedAt : undefined,
+      });
+      if (!saved.summary) void summariseSession(user.id, saved.id).catch(() => {});
+    } catch (err) {
+      console.warn("[voice/record] transcript save failed", (err as Error).message);
+    }
+  }
 
   // ElevenLabs finalises the record shortly after disconnect; retry briefly.
   let durationSec: number | undefined;

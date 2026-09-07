@@ -57,6 +57,11 @@ function client() {
   return _client;
 }
 
+/** Shared client for other server modules (notes, journal, reflect). */
+export function llmClient(): OpenAI {
+  return client();
+}
+
 /** True when a real model key is present. Without it every route falls back to a mock stream. */
 export function llmConfigured(): boolean {
   return !!process.env.OPENAI_API_KEY;

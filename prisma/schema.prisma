@@ -117,6 +117,8 @@ model Session {
   summary    String?
   moodBefore Int?
   moodAfter  Int?
+  // Voice: the ElevenLabs conversation id, so a replayed record is not a second session.
+  externalId String?   @unique
 
   @@index([userId, startedAt])
 }
@@ -236,10 +238,15 @@ model UsageEvent {
   estimatedCostUsd  Float?
   stance            String?
   ruleViolations    String?
+  // Links the turn to its conversation, and keeps enough to recompute cost.
+  sessionId         String?
+  model             String?
+  cacheReadTokens   Int?
   at                DateTime @default(now())
 
   @@index([at])
   @@index([userId, at])
+  @@index([sessionId])
 }
 
 model EmailQueueRow {

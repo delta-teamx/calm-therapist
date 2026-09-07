@@ -9,6 +9,9 @@ export interface UsageEvent {
   estimatedCostUsd?: number;
   stance?: string;
   ruleViolations?: string;
+  sessionId?: string;
+  model?: string;
+  cacheReadTokens?: number;
   at: string;
 }
 
@@ -38,6 +41,7 @@ export async function recordLlmUsage(input: {
   model?: string;
   stance?: string;
   ruleViolations?: string;
+  sessionId?: string;
 }): Promise<void> {
   const cost = estimateLlmCost(input.model, input.tokensIn, input.cacheReadTokens, input.tokensOut);
   const event: UsageEvent = {
@@ -49,6 +53,9 @@ export async function recordLlmUsage(input: {
     estimatedCostUsd: Number(cost.toFixed(6)),
     stance: input.stance,
     ruleViolations: input.ruleViolations,
+    sessionId: input.sessionId,
+    model: input.model,
+    cacheReadTokens: input.cacheReadTokens,
     at: new Date().toISOString(),
   };
   if (dbEnabled) {
@@ -62,6 +69,9 @@ export async function recordLlmUsage(input: {
         estimatedCostUsd: event.estimatedCostUsd,
         stance: input.stance ?? null,
         ruleViolations: input.ruleViolations ?? null,
+        sessionId: input.sessionId ?? null,
+        model: input.model ?? null,
+        cacheReadTokens: input.cacheReadTokens ?? null,
       },
     });
     return;

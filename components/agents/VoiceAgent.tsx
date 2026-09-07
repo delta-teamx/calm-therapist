@@ -40,6 +40,8 @@ export function VoiceAgent({ profile, onSessionRecorded, onSwitchToChat }: Voice
   const transcriptRef = useRef<HTMLDivElement>(null);
   const sessionIdRef = useRef<string | null>(null);
   const conversationIdRef = useRef<string | null>(null);
+  const startedAtRef = useRef<string | null>(null);
+  const transcriptRef2 = useRef<{ role: "agent" | "user"; content: string; timestamp: string }[]>([]);
 
   const conversation = useConversation({
     onConnect: () => setError(null),
@@ -49,7 +51,8 @@ export function VoiceAgent({ profile, onSessionRecorded, onSwitchToChat }: Voice
       sessionIdRef.current = null;
       conversationIdRef.current = null;
       if (!sessionId || !conversationId) return;
-      const body = JSON.stringify({ sessionId, conversationId });
+      const turns = transcriptRef2.current.map((t) => ({ role: t.role === "agent" ? "assistant" : "user", content: t.content, at: t.timestamp }));
+      const body = JSON.stringify({ sessionId, conversationId, transcript: turns, startedAt: startedAtRef.current });
       // Recording happens server-side from ElevenLabs' own record. Beacon
       // survives tab close; fetch covers the normal path and refreshes quota.
       if (typeof navigator.sendBeacon === "function") {
@@ -60,10 +63,9 @@ export function VoiceAgent({ profile, onSessionRecorded, onSwitchToChat }: Voice
         .catch(() => {});
     },
     onMessage: ({ message, source }: { message: string; source: "user" | "ai" }) => {
-      setTranscript((prev) => [
-        ...prev,
-        { role: source === "ai" ? "agent" : "user", content: message, timestamp: new Date().toISOString() },
-      ]);
+      const turn = { role: (source === "ai" ? "agent" : "user") as "agent" | "user", content: message, timestamp: new Date().toISOString() };
+      transcriptRef2.current = [...transcriptRef2.current, turn];
+      setTranscript((prev) => [...prev, turn]);
     },
     onError: (err: unknown) => {
       console.error("ElevenLabs error:", err);
@@ -73,6 +75,8 @@ export function VoiceAgent({ profile, onSessionRecorded, onSwitchToChat }: Voice
 
   const startSession = async () => {
     setIsRequesting(true);
+    startedAtRef.current = new Date().toISOString();
+    transcriptRef2.current = [];
     setError(null);
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });

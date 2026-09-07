@@ -50,10 +50,39 @@ export function ChatAgent({
   const taRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [dateLine, setDateLine] = useState("");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const sessionIdRef = useRef<string | null>(null);
+  sessionIdRef.current = sessionId;
 
   useEffect(() => {
     setDateLine(new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" }));
-    return () => abortRef.current?.abort();
+    // Continue today's conversation if there is one, so a reload keeps the thread.
+    fetch("/api/sessions/current?mode=chat")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { session?: { id: string; transcript: { role: "user" | "assistant"; content: string; at: string }[] } | null } | null) => {
+        const s = d?.session;
+        if (!s) return;
+        setSessionId(s.id);
+        if (s.transcript.length) {
+          setMessages([
+            { role: "assistant", content: `Welcome back, ${profile.name}. We can pick up where we left off.`, timestamp: s.transcript[0].at },
+            ...s.transcript.map((t) => ({ role: t.role, content: t.content, timestamp: t.at })),
+          ]);
+        }
+      })
+      .catch(() => {});
+    // On tab close, let Aura write her note for the session.
+    const onHide = () => {
+      const id = sessionIdRef.current;
+      if (!id || typeof navigator.sendBeacon !== "function") return;
+      navigator.sendBeacon(`/api/sessions/${id}/close`, new Blob(["{}"], { type: "application/json" }));
+    };
+    window.addEventListener("pagehide", onHide);
+    return () => {
+      window.removeEventListener("pagehide", onHide);
+      abortRef.current?.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -106,6 +135,7 @@ export function ChatAgent({
           messages: next.filter((m, i) => !(i === 0 && m.role === "assistant")).map((m) => ({ role: m.role, content: m.content })),
           profile: { ...profile, activeModes: activeMode ? [activeMode] : [] },
           mode,
+          sessionId,
         }),
       });
       if (!res.ok) {
@@ -116,6 +146,8 @@ export function ChatAgent({
         return;
       }
       if (!res.body) throw new Error("No body");
+      const sid = res.headers.get("X-Session-Id");
+      if (sid && sid !== sessionId) setSessionId(sid);
       const tierHeader = Number(res.headers.get("X-Crisis-Tier") ?? "0");
       if (tierHeader > 0) {
         setCrisisTier(tierHeader);
@@ -203,8 +235,13 @@ export function ChatAgent({
             type="button"
             onClick={() => {
               setWrappingUp(true);
-              // Fire-and-forget: reset the inactivity ladder. No session
-              // content ever leaves the conversation.
+              // Close the conversation so Aura writes her note, then reset
+              // the inactivity ladder. No session content is emailed.
+              if (sessionId) {
+                fetch(`/api/sessions/${sessionId}/close`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}", keepalive: true })
+                  .then(() => setSessionId(null))
+                  .catch(() => {});
+              }
               fetch("/api/email/track", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
