@@ -20,25 +20,25 @@ export default async function AdminOverview() {
           <StatCard label="Total signups" value={s.signups.total} hint={`${s.signups.last7d} in last 7d · ${s.signups.last30d} in 30d`} />
           <StatCard label="Total leads (popup)" value={s.leads.total} hint={`${s.leads.last7d} in last 7d`} />
           <StatCard label="Lead → signup" value={`${s.conversion.leadsToSignups}%`} />
-          <StatCard label="Signup → Pro" value={`${s.conversion.signupsToPro}%`} />
+          <StatCard label="Email verified" value={`${s.conversion.verified}%`} />
         </Grid>
       </Section>
 
       <Section title="Engagement">
         <Grid>
           <StatCard label="Live users (5 min)" value={s.liveUsers} hint="Active API events in the last 5 minutes" />
-          <StatCard label="Recurring users" value={s.recurringUsers} hint="Older than 7d, still active" />
+          <StatCard label="Recurring users" value={s.recurringUsers} hint="Active on two or more days in the last 30" />
           <StatCard label="Model requests" value={s.api.llmRequests} hint={`${s.api.totalTokensIn.toLocaleString()} in / ${s.api.totalTokensOut.toLocaleString()} out`} />
           <StatCard label="Voice sessions" value={s.api.voiceRequests} />
         </Grid>
       </Section>
 
-      <Section title="Revenue">
+      <Section title="Founding period and cost">
         <Grid>
-          <StatCard label="Pro accounts" value={s.paid.proCount} />
-          <StatCard label="MRR (USD)" value={`$${s.paid.mrrUsd.toLocaleString()}`} hint="At $19/mo per Pro" />
-          <StatCard label="ARR (USD)" value={`$${s.paid.arrUsd.toLocaleString()}`} />
-          <StatCard label="Estimated API spend" value={`$${s.api.totalCostUsd.toFixed(2)}`} hint="Model + voice estimate" />
+          <StatCard label="Founding seats" value={`${s.founding.seatsTaken} / ${s.founding.cap}`} hint="Free for four months each" />
+          <StatCard label="Circles gate" value={`${Math.min(s.signups.total, s.founding.circlesOpenAt)} / ${s.founding.circlesOpenAt}`} hint="Circles open at this many members" />
+          <StatCard label="API spend, last 30 days" value={`$${s.api.last30d.totalCostUsd.toFixed(2)}`} hint={`${s.api.last30d.llmRequests} model · ${s.api.last30d.voiceRequests} voice`} />
+          <StatCard label="API spend, all time" value={`$${s.api.totalCostUsd.toFixed(2)}`} hint="Model + voice estimate" />
         </Grid>
       </Section>
 

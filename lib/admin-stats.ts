@@ -1,16 +1,16 @@
 import { listLeads } from "@/lib/leads";
 import { feedbackStats, listFeedback } from "@/lib/feedback";
-import { listUsage, usageSummary } from "@/lib/usage";
+import { usageTotals, type UsageTotals } from "@/lib/usage";
 import { listAllUsers, type UserRecord } from "@/lib/users";
-
-const PRO_MONTHLY_USD = 19;
+import { FOUNDING_MEMBER_CAP } from "@/lib/access";
+import { CIRCLES_OPEN_AT } from "@/lib/circle-themes";
 
 export interface AdminStats {
   signups: { total: number; last7d: number; last30d: number };
   leads: { total: number; last7d: number };
-  conversion: { leadsToSignups: number; signupsToPro: number };
-  paid: { proCount: number; mrrUsd: number; arrUsd: number };
-  api: { llmRequests: number; voiceRequests: number; totalCostUsd: number; totalTokensIn: number; totalTokensOut: number };
+  conversion: { leadsToSignups: number; verified: number };
+  founding: { seatsTaken: number; cap: number; circlesOpenAt: number };
+  api: UsageTotals;
   feedback: { total: number; positive: number; needsAttention: number; average: number };
   liveUsers: number;
   recurringUsers: number;
@@ -18,14 +18,10 @@ export interface AdminStats {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/** Members only: the admin account is not a signup. */
 export async function computeAdminStats(): Promise<AdminStats> {
-  const [users, leads, usage, fb, usageEvents] = await Promise.all([
-    listAllUsers(),
-    listLeads(),
-    usageSummary(),
-    feedbackStats(),
-    listUsage(),
-  ]);
+  const [allUsers, leads, api, fb] = await Promise.all([listAllUsers(), listLeads(), usageTotals(), feedbackStats()]);
+  const users = allUsers.filter((u) => !u.isAdmin);
 
   const now = Date.now();
   const since7 = now - 7 * DAY_MS;
@@ -34,43 +30,28 @@ export async function computeAdminStats(): Promise<AdminStats> {
   const signupsTotal = users.length;
   const signups7 = users.filter((u) => Date.parse(u.createdAt) >= since7).length;
   const signups30 = users.filter((u) => Date.parse(u.createdAt) >= since30).length;
-
-  const proCount = users.filter((u) => u.plan === "pro").length;
-  const mrr = proCount * PRO_MONTHLY_USD;
+  const verified = users.filter((u) => !!u.emailVerified).length;
 
   const leadsTotal = leads.length;
   const leads7 = leads.filter((l) => Date.parse(l.capturedAt) >= since7).length;
-
-  const leadsToSignups = leadsTotal === 0 ? 0 : signupsTotal / leadsTotal;
-  const signupsToPro = signupsTotal === 0 ? 0 : proCount / signupsTotal;
-
-  const liveSet = new Set(
-    usageEvents
-      .filter((u) => Date.parse(u.at) >= now - 5 * 60 * 1000 && u.userId)
-      .map((u) => u.userId)
-  );
-  const liveUsers = liveSet.size;
-
-  const usersById = new Map(users.map((u) => [u.id, u] as const));
-  const usedIds = new Set(usageEvents.map((u) => u.userId).filter(Boolean) as string[]);
-  let recurring = 0;
-  usedIds.forEach((id) => {
-    const u = usersById.get(id);
-    if (u && Date.parse(u.createdAt) <= since7) recurring += 1;
-  });
+  const leadsToSignups = leadsTotal === 0 ? 0 : Math.min(1, signupsTotal / leadsTotal);
 
   return {
     signups: { total: signupsTotal, last7d: signups7, last30d: signups30 },
     leads: { total: leadsTotal, last7d: leads7 },
     conversion: {
       leadsToSignups: Number((leadsToSignups * 100).toFixed(1)),
-      signupsToPro: Number((signupsToPro * 100).toFixed(1)),
+      verified: signupsTotal === 0 ? 0 : Number(((verified / signupsTotal) * 100).toFixed(1)),
     },
-    paid: { proCount, mrrUsd: mrr, arrUsd: mrr * 12 },
-    api: usage,
+    founding: {
+      seatsTaken: users.filter((u) => u.memberNumber != null && u.memberNumber <= FOUNDING_MEMBER_CAP).length,
+      cap: FOUNDING_MEMBER_CAP,
+      circlesOpenAt: CIRCLES_OPEN_AT,
+    },
+    api,
     feedback: fb,
-    liveUsers,
-    recurringUsers: recurring,
+    liveUsers: api.liveUsers,
+    recurringUsers: api.recurringUsers,
   };
 }
 

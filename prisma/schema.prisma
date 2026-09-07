@@ -213,6 +213,8 @@ model Feedback {
   status        String    @default("new") // "new" | "reviewed" | "responded"
   adminResponse String?
   respondedAt   DateTime?
+  // The conversation this was about, when one was recent enough to tell.
+  sessionId     String?
   createdAt     DateTime  @default(now())
 
   @@index([category, createdAt])

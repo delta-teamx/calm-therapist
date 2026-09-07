@@ -16,6 +16,7 @@ export interface FeedbackRecord {
   createdAt: string;
   adminResponse?: string;
   respondedAt?: string;
+  sessionId?: string;
 }
 
 const globalAny = globalThis as unknown as { __calmFeedback?: FeedbackRecord[] };
@@ -35,6 +36,7 @@ export async function captureFeedback(input: {
   rating: number;
   comment: string;
   publicConsent: boolean;
+  sessionId?: string;
 }): Promise<FeedbackRecord> {
   const rating = Math.max(1, Math.min(5, Math.round(input.rating)));
   const category = categorize(rating);
@@ -50,6 +52,7 @@ export async function captureFeedback(input: {
         publicConsent: input.publicConsent,
         category,
         status: "new",
+        sessionId: input.sessionId ?? null,
       },
     });
     return rowToRecord(row);
@@ -66,9 +69,20 @@ export async function captureFeedback(input: {
     category,
     status: "new",
     createdAt: new Date().toISOString(),
+    sessionId: input.sessionId,
   };
   memoryStore.push(record);
   return record;
+}
+
+/** True when the member already left feedback in the last seven days. */
+export async function recentlyGaveFeedback(userId: string): Promise<boolean> {
+  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  if (dbEnabled) {
+    const n = await prisma.feedback.count({ where: { userId, createdAt: { gte: since } } });
+    return n > 0;
+  }
+  return memoryStore.some((f) => f.userId === userId && new Date(f.createdAt) >= since);
 }
 
 export async function listFeedback(filter?: {
@@ -189,6 +203,7 @@ function rowToRecord(row: PrismaFeedbackRow): FeedbackRecord {
     status: (row.status as FeedbackStatus) ?? "new",
     adminResponse: row.adminResponse ?? undefined,
     respondedAt: row.respondedAt?.toISOString(),
+    sessionId: row.sessionId ?? undefined,
     createdAt: row.createdAt.toISOString(),
   };
 }

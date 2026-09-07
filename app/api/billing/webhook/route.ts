@@ -29,10 +29,18 @@ export async function POST(req: Request) {
   try {
     event = stripe().webhooks.constructEvent(body, sig, secret);
   } catch (err) {
-    console.error("[stripe webhook] bad signature", (err as Error).message);
-    return NextResponse.json({ error: "bad signature" }, { status: 400 });
+    return NextResponse.json({ error: `Webhook signature failed: ${(err as Error).message}` }, { status: 400 });
   }
 
+  // Stripe retries deliveries; record the event id first so a retry is a no-op.
+  if (dbEnabled) {
+    try {
+      await prisma.stripeEvent.create({ data: { id: event.id, type: event.type } });
+    } catch (err) {
+      if ((err as { code?: string }).code === "P2002") return NextResponse.json({ received: true, duplicate: true });
+      throw err;
+    }
+  }
   try {
     switch (event.type) {
       case "checkout.session.completed":

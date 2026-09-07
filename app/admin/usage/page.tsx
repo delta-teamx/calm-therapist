@@ -11,7 +11,7 @@ export default async function AdminUsagePage() {
     <div>
       <h2 style={{ marginBottom: 8 }}>API & revenue</h2>
       <p style={{ color: "var(--calm-ink-70)", marginBottom: 32 }}>
-        API spend is estimated against published pricing. Revenue assumes flat $19/mo per Pro user.
+        API spend is estimated against published pricing. Nothing is for sale yet.
       </p>
 
       <div
@@ -22,10 +22,9 @@ export default async function AdminUsagePage() {
           marginBottom: 32,
         }}
       >
-        <StatCard label="Pro accounts" value={s.paid.proCount} />
-        <StatCard label="MRR (USD)" value={`$${s.paid.mrrUsd.toLocaleString()}`} />
-        <StatCard label="ARR (USD)" value={`$${s.paid.arrUsd.toLocaleString()}`} />
-        <StatCard label="Estimated API spend" value={`$${s.api.totalCostUsd.toFixed(2)}`} hint="Net margin tracker (Stripe coming)" />
+        <StatCard label="API spend, last 30 days" value={`$${s.api.last30d.totalCostUsd.toFixed(2)}`} />
+        <StatCard label="API spend, all time" value={`$${s.api.totalCostUsd.toFixed(2)}`} hint="Nothing is for sale yet; this is cost only" />
+        <StatCard label="Tokens in / out" value={`${s.api.totalTokensIn.toLocaleString()} / ${s.api.totalTokensOut.toLocaleString()}`} />
         <StatCard label="Model requests" value={s.api.llmRequests} />
         <StatCard label="Voice sessions" value={s.api.voiceRequests} />
       </div>
