@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PageShell } from "@/components/seo/PageShell";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo";
 import { BRAND } from "@/lib/brand";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 
 export interface FeaturePageProps {
   slug: string;
@@ -27,9 +28,7 @@ export function FeaturePageTemplate(props: FeaturePageProps) {
       />
       <section className="section">
         <div className="container" style={{ maxWidth: 880 }}>
-          <p className="micro-label micro-label-bordered" style={{ marginBottom: 24 }}>
-            Feature
-          </p>
+          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Features", href: "/features" }, { name: props.label }]} />
           <h1 style={{ marginBottom: 24 }}>{props.label}</h1>
           <p className="body-large" style={{ color: "var(--calm-ink-70)", marginBottom: 32 }}>
             {props.oneLiner}

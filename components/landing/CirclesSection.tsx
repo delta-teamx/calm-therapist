@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Style } from "@/components/ui/Style";
 import { CIRCLE_MINUTES, CIRCLE_SEATS, CIRCLE_THEMES, CIRCLES_OPEN_AT } from "@/lib/circle-themes";
 
@@ -46,18 +45,14 @@ export function CirclesSection() {
 
         <div className="circles-grid">
           {STEPS.map((s, i) => (
-            <motion.div
+            <div
               key={s.title}
               className="circles-card"
-              initial={{ y: 16, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: i * 0.06 }}
             >
               <span className="circles-num">{String(i + 1).padStart(2, "0")}</span>
               <h4 style={{ color: "white", marginBottom: 8 }}>{s.title}</h4>
               <p style={{ fontSize: 15, lineHeight: 1.7, color: "rgba(255,255,255,0.72)" }}>{s.body}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
 

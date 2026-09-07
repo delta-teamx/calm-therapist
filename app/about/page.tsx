@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageShell } from "@/components/seo/PageShell";
-import { pageMetadata } from "@/lib/seo";
+import { JsonLd, pageMetadata, profilePageSchema } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "About Calm Therapist | Backed by Implenix",
@@ -12,6 +12,7 @@ export const metadata = pageMetadata({
 export default function AboutPage() {
   return (
     <PageShell>
+      {(() => { const p = profilePageSchema(); return p ? <JsonLd data={p} /> : null; })()}
       <article style={{ padding: "120px 24px 80px" }}>
         <div className="container" style={{ maxWidth: 760 }}>
           <p className="micro-label micro-label-bordered" style={{ marginBottom: 24 }}>

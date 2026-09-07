@@ -6,8 +6,11 @@ import { BRAND } from "@/lib/brand";
 
 const BASE = BRAND.url;
 
+/** Bump when page copy changes. A lastmod that moves on every build is ignored by Google. */
+const CONTENT_UPDATED = new Date(process.env.NEXT_PUBLIC_CONTENT_UPDATED ?? "2026-09-05");
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const now = CONTENT_UPDATED;
 
   const staticPaths: { path: string; priority: number; freq: "monthly" | "weekly" | "daily" }[] = [
     { path: "/", priority: 1.0, freq: "weekly" },

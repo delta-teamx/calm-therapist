@@ -1,5 +1,6 @@
 import { BRAND } from "@/lib/brand";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createUser, setVerifyToken } from "@/lib/users";
 import { buildSessionCookie, cookieDomainFor, isAdminEmail, signSession } from "@/lib/auth";
 import { scheduleEmail } from "@/lib/email-queue";
@@ -33,7 +34,15 @@ export async function POST(req: Request) {
   }
 
   try {
-    const user = await createUser({ email, password, name });
+    let source: { landing?: string; referrer?: string } | undefined;
+    try {
+      const raw = cookies().get("calm_src")?.value;
+      if (raw) {
+        const p = JSON.parse(raw) as { l?: string; r?: string; u?: string };
+        source = { landing: [p.l, p.u].filter(Boolean).join(" ?") || undefined, referrer: p.r || undefined };
+      }
+    } catch {}
+    const user = await createUser({ email, password, name, source });
     const token = await signSession({
       sub: user.id,
       email: user.email,

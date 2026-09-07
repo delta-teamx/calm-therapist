@@ -24,6 +24,9 @@ model User {
   // Founding access: member number assigned at signup; the first 150 get full
   // access for four months from foundingUntil computation (see lib/access.ts).
   memberNumber       Int?           @unique
+  // First-touch attribution captured at signup (landing path, external referrer).
+  signupLanding      String?
+  signupReferrer     String?
   // Email preferences
   emailOptOut        Boolean        @default(false)
   unsubscribeToken   String?        @unique

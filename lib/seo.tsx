@@ -37,8 +37,73 @@ export function organizationSchema() {
     url: BASE_URL,
     logo: `${BASE_URL}/og-image.png`,
     parentOrganization: { "@type": "Organization", name: BRAND.parent.name, url: BRAND.parent.url },
-    sameAs: [BRAND.parent.url],
+    sameAs: [BRAND.parent.url, ...(process.env.NEXT_PUBLIC_SOCIAL_URLS ?? "").split(",").map((s) => s.trim()).filter(Boolean)],
     description: BRAND.description,
+    ...(process.env.NEXT_PUBLIC_AUTHOR_NAME ? { founder: { "@type": "Person", name: process.env.NEXT_PUBLIC_AUTHOR_NAME } } : {}),
+  };
+}
+
+/** Names the site for sitelinks and the knowledge panel. */
+export function webSiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: BRAND.name,
+    url: BASE_URL,
+    inLanguage: ["en", "ur", "hi", "ar", "es", "fr"],
+    publisher: { "@type": "Organization", name: BRAND.parent.name, url: BRAND.parent.url },
+  };
+}
+
+/** The named human behind the pages. Set NEXT_PUBLIC_AUTHOR_NAME and NEXT_PUBLIC_AUTHOR_URL. */
+export function authorSchema() {
+  const name = process.env.NEXT_PUBLIC_AUTHOR_NAME;
+  if (!name) return { "@type": "Organization", name: BRAND.name, url: BASE_URL };
+  return {
+    "@type": "Person",
+    name,
+    url: process.env.NEXT_PUBLIC_AUTHOR_URL || `${BASE_URL}/about`,
+    ...(process.env.NEXT_PUBLIC_AUTHOR_TITLE ? { jobTitle: process.env.NEXT_PUBLIC_AUTHOR_TITLE } : {}),
+  };
+}
+
+/** The about page as a ProfilePage for the named founder; only when a name is configured. */
+export function profilePageSchema() {
+  const name = process.env.NEXT_PUBLIC_AUTHOR_NAME;
+  if (!name) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    mainEntity: {
+      "@type": "Person",
+      name,
+      ...(process.env.NEXT_PUBLIC_AUTHOR_TITLE ? { jobTitle: process.env.NEXT_PUBLIC_AUTHOR_TITLE } : {}),
+      url: `${BASE_URL}/about`,
+      worksFor: { "@type": "Organization", name: BRAND.parent.name, url: BRAND.parent.url },
+      sameAs: (process.env.NEXT_PUBLIC_SOCIAL_URLS ?? "").split(",").map((s) => s.trim()).filter(Boolean),
+    },
+  };
+}
+
+/**
+ * A reviewed health page. Emits nothing until a clinical reviewer is
+ * configured, so the site never claims a review it did not have.
+ */
+export function reviewedPageSchema(args: { path: string; name: string; lastReviewed?: string }) {
+  const reviewer = process.env.NEXT_PUBLIC_REVIEWER_NAME;
+  if (!reviewer) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "MedicalWebPage",
+    name: args.name,
+    url: `${BASE_URL}${args.path}`,
+    lastReviewed: args.lastReviewed ?? process.env.NEXT_PUBLIC_CONTENT_UPDATED ?? "2026-09-05",
+    reviewedBy: {
+      "@type": "Person",
+      name: reviewer,
+      ...(process.env.NEXT_PUBLIC_REVIEWER_TITLE ? { jobTitle: process.env.NEXT_PUBLIC_REVIEWER_TITLE } : {}),
+    },
+    about: { "@type": "MedicalCondition", name: "Mental health" },
   };
 }
 
@@ -59,6 +124,7 @@ export function articleSchema(args: {
   description: string;
   slug: string;
   publishedAt: string;
+  updatedAt?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -66,15 +132,15 @@ export function articleSchema(args: {
     headline: args.title,
     description: args.description,
     datePublished: args.publishedAt,
-    author: {
-      "@type": "Organization",
-      name: "Calm Therapist Editorial",
-    },
+    dateModified: args.updatedAt ?? args.publishedAt,
+    author: authorSchema(),
     publisher: {
       "@type": "Organization",
-      name: "Calm Therapist",
+      name: BRAND.name,
       logo: { "@type": "ImageObject", url: `${BASE_URL}/og-image.png` },
     },
+    image: [`${BASE_URL}/og-image.png`],
+    inLanguage: "en",
     mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE_URL}/blog/${args.slug}` },
   };
 }

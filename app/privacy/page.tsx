@@ -3,7 +3,7 @@ import { PageShell } from "@/components/seo/PageShell";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Privacy at Calm Therapist | What We Do With Your Data (Spoiler: As Little As Possible)",
+  title: "Privacy | What We Do With Your Data | Calm Therapist",
   description:
     "Calm Therapist's full privacy architecture. No training on your data. Stored for you, in your account. One-click delete. Backed by Implenix.",
   path: "/privacy",

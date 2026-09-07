@@ -3,7 +3,7 @@ import { PageShell } from "@/components/seo/PageShell";
 import { JsonLd, howToSchema, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "How Calm Therapist Works | The AI Therapist That Actually Remembers You",
+  title: "How It Works | A Free AI Therapist That Remembers You",
   description:
     "How Calm Therapist works: 5-minute onboarding, voice or chat sessions, memory across every conversation, weekly journaling, and monthly reflections.",
   path: "/how-it-works",

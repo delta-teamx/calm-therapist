@@ -2,7 +2,7 @@ import { FeaturePageTemplate } from "@/components/seo/FeaturePage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Weekly Journal AI Therapy | Calm Therapist — Patterns You Couldn't See",
+  title: "Weekly Journal | Patterns You Couldn't See | Calm Therapist",
   description:
     "AI-powered weekly journaling that reads back to you what you didn't notice. Calm Therapist's Weekly Journal turns scattered sessions into a coherent story.",
   path: "/features/journal",

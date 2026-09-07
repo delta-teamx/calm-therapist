@@ -2,7 +2,7 @@ import { ConditionPageTemplate } from "@/components/seo/ConditionPage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "AI Therapy for Depression | Calm Therapist — Stay Visible to Yourself",
+  title: "AI Therapist for Depression | Stay Visible to Yourself",
   description:
     "AI therapy designed for depression. Calm Therapist holds the record so you don't have to, surfaces patterns you can't see, and keeps you visible to yourself.",
   path: "/for/depression",

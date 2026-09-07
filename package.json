@@ -15,6 +15,7 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:studio": "prisma studio",
     "prebuild": "node scripts/migrate-if-db.js",
+    "postbuild": "node scripts/indexnow.js",
     "db:migrate:diff": "prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma --script"
   },
   "dependencies": {

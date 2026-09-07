@@ -2,7 +2,6 @@
 
 import { Style } from "@/components/ui/Style";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 
 /**
@@ -65,41 +64,29 @@ export function FeelItFirst() {
 
   return (
     <section style={{ background: "var(--calm-white)", padding: "140px 24px 80px" }}>
-      <div className="container" style={{ maxWidth: 880 }}>
-        <motion.span
-          initial={{ y: 16, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+      <div className="container hero-rise" style={{ maxWidth: 880 }}>
+        <span
           className="micro-label micro-label-bordered"
           style={{ display: "inline-block", marginBottom: 28 }}
         >
           Free AI therapist · Voice · Circles
-        </motion.span>
+        </span>
 
-        <motion.h1
-          initial={{ y: 24, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.55, delay: 0.05 }}
+        <h1
           style={{ fontSize: 68, lineHeight: 1.05, marginBottom: 24 }}
         >
           A free AI therapist that remembers you.
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ y: 16, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.55, delay: 0.12 }}
+        <p
           className="body-large"
           style={{ color: "var(--calm-ink-70)", maxWidth: 640, marginBottom: 40 }}
         >
           Aura listens, remembers, and pushes back when it matters. Chat is free, always. One
           sentence is enough to start — no email, no name, no signup screen first.
-        </motion.p>
+        </p>
 
-        <motion.form
-          initial={{ y: 12, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.55, delay: 0.18 }}
+        <form
           onSubmit={submit}
           className="feel-form"
         >
@@ -133,13 +120,10 @@ export function FeelItFirst() {
             </span>
           </div>
           {error && <p style={{ marginTop: 12, fontSize: 14, color: "var(--calm-ink)" }}>{error}</p>}
-        </motion.form>
+        </form>
 
         {phase !== "idle" && (
-          <motion.div
-            initial={{ y: 12, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
+          <div
             className="feel-reply-wrap"
           >
             <p className="body-micro" style={{ color: "var(--calm-forest)", marginBottom: 12 }}>
@@ -175,11 +159,15 @@ export function FeelItFirst() {
                 </button>
               </div>
             )}
-          </motion.div>
+          </div>
         )}
       </div>
 
       <Style>{`
+        .hero-rise > * { animation: hero-rise .55s ease both; }
+        .hero-rise > *:nth-child(2) { animation-delay: .05s } .hero-rise > *:nth-child(3) { animation-delay: .1s } .hero-rise > *:nth-child(4) { animation-delay: .15s }
+        @keyframes hero-rise { from { opacity: .001; transform: translateY(10px) } to { opacity: 1; transform: none } }
+        @media (prefers-reduced-motion: reduce) { .hero-rise > * { animation: none } }
         .feel-form {
           background: var(--calm-mist);
           border-radius: 18px;

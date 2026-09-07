@@ -2,7 +2,7 @@ import { ConditionPageTemplate } from "@/components/seo/ConditionPage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "AI Therapy for Grief | Calm Therapist — Take As Long As It Takes",
+  title: "AI Therapist for Grief | Take As Long As It Takes",
   description:
     "AI therapy for grief that doesn't time-box you. Calm Therapist remembers who you lost, names the anniversaries, and holds the long arc of grief.",
   path: "/for/grief",

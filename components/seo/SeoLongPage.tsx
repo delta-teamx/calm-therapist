@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { PageShell } from "@/components/seo/PageShell";
-import { JsonLd, breadcrumbSchema, faqSchema } from "@/lib/seo";
+import { JsonLd, breadcrumbSchema, faqSchema, reviewedPageSchema } from "@/lib/seo";
 import type { SeoPage } from "@/lib/seo-pages";
 import { BRAND } from "@/lib/brand";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 
 interface Props {
   page: SeoPage;
@@ -20,12 +21,11 @@ export function SeoLongPage({ page, path }: Props) {
         ])}
       />
       <JsonLd data={faqSchema(page.faqs)} />
+      {(() => { const r = reviewedPageSchema({ path, name: page.h1 }); return r ? <JsonLd data={r} /> : null; })()}
 
       <article className="section">
         <div className="container" style={{ maxWidth: 760 }}>
-          <p className="micro-label micro-label-bordered" style={{ marginBottom: 24 }}>
-            {BRAND.name}
-          </p>
+          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Learn", href: "/ai-therapist" }, { name: page.h1 }]} />
           <h1 style={{ marginBottom: 24, fontSize: 56, lineHeight: 1.1 }}>{page.h1}</h1>
           <p className="body-large" style={{ color: "var(--calm-ink-70)", marginBottom: 48 }}>
             {page.intro}
@@ -34,7 +34,7 @@ export function SeoLongPage({ page, path }: Props) {
           {page.sections.map((s, i) => (
             <section key={i} style={{ marginBottom: 40 }}>
               <h2 style={{ marginBottom: 16 }}>{s.heading}</h2>
-              {s.paragraphs.map((p, j) => (
+              {(s.paragraphs ?? []).map((p, j) => (
                 <p key={j} style={{ fontSize: 17, lineHeight: 1.85, marginBottom: 16, color: "var(--calm-ink)" }}>
                   {p}
                 </p>

@@ -14,7 +14,7 @@ import { FoundingStrip } from "@/components/landing/FoundingStrip";
 import { CirclesSection } from "@/components/landing/CirclesSection";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { LeadPopupLazy } from "@/components/landing/LeadPopupLazy";
-import { JsonLd, organizationSchema, softwareApplicationSchema } from "@/lib/seo";
+import { JsonLd, organizationSchema, softwareApplicationSchema, webSiteSchema } from "@/lib/seo";
 import { BRAND } from "@/lib/brand";
 import type { Metadata } from "next";
 
@@ -29,6 +29,7 @@ export default function HomePage() {
     <>
       <JsonLd data={organizationSchema()} />
       <JsonLd data={softwareApplicationSchema()} />
+      <JsonLd data={webSiteSchema()} />
       <Navbar />
       <main>
         <FeelItFirst />

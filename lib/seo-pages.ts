@@ -4,7 +4,7 @@
 
 export interface SeoSection {
   heading: string;
-  paragraphs: string[];
+  paragraphs?: string[];
   bullets?: string[];
 }
 
@@ -39,14 +39,29 @@ const COMMON_RELATED = [
   { href: "/circles", label: "Circles: small anonymous groups" },
 ];
 
+const COMPARE_RELATED = [
+  { href: "/free-ai-therapist", label: "Free AI therapist" },
+  { href: "/best-free-ai-therapist-apps", label: "Best free AI therapist apps, ranked" },
+  { href: "/ai-therapist-vs-chatgpt", label: "AI therapist vs ChatGPT" },
+  { href: "/ai-therapist-vs-wysa", label: "Wysa vs Aura" },
+  { href: "/woebot-alternative", label: "Woebot alternative" },
+  { href: "/youper-alternative", label: "Youper alternative" },
+  { href: "/character-ai-psychologist-alternative", label: "Character.AI Psychologist vs Aura" },
+  { href: "/ai-therapist-vs-betterhelp", label: "AI therapist vs BetterHelp" },
+  { href: "/ai-therapist-vs-human-therapist", label: "AI vs human therapist" },
+  { href: "/is-ai-therapy-safe", label: "Is AI therapy safe?" },
+  { href: "/ai-therapist-in-your-language", label: "In your language" },
+  { href: "/circles", label: "Circles" },
+];
+
 /* ---------- Pillar / cluster pages --------------------------------- */
 
 export const PAGES: Record<string, SeoPage> = {
   "free-ai-therapist": {
     slug: "free-ai-therapist",
-    title: "Free AI Therapist | Talk to Aura, No Card, No Session Cap — Calm Therapist",
+    title: "Free AI Therapist | No Card, No Session Cap | Calm Therapist",
     description:
-      "A free AI therapist you can talk to any hour. Aura remembers you, pushes back kindly, never diagnoses, and shows the right crisis line for your country. Chat is free for everyone, always.",
+      "A free AI therapist you can talk to any hour. Aura remembers you, pushes back kindly, never diagnoses, and shows the crisis line for your country. Free, always.",
     h1: "A free AI therapist, without the catch.",
     intro:
       "Most \"free AI therapist\" apps are free for three messages, or free until the timer runs out, or free until you want the one feature that made you download it. Calm Therapist is different in one boring, important way: chat with Aura is free for everyone, with no session cap, no card, and no upgrade prompt in the middle of a hard night. The first 150 members also get voice and circles free for four months. This page says exactly what free means here, what it does not, and how we pay for it.",
@@ -103,9 +118,9 @@ export const PAGES: Record<string, SeoPage> = {
 
   "ai-therapist-in-your-language": {
     slug: "ai-therapist-in-your-language",
-    title: "AI Therapist in Urdu, Hindi, Arabic, Spanish, French | Calm Therapist",
+    title: "AI Therapist in Urdu, Hindi, Arabic, Spanish, French",
     description:
-      "An AI therapist that speaks your language and switches when you do: Urdu, Hindi, Arabic, Spanish, French, English, and the mix between. Built for diaspora families, not a Western template.",
+      "An AI therapist that speaks your language and switches when you do: Urdu, Hindi, Arabic, Spanish, French, English. Built for diaspora families, not a Western template.",
     h1: "An AI therapist that speaks the way you do at home.",
     intro:
       "Most mental-health apps are written in English, think in English, and assume a Western family. If you grew up between languages, that is a wall before the first sentence. Aura works in English, Urdu, Hindi, Arabic, Spanish, and French, reads Roman Urdu and Hinglish, and switches mid-sentence when you do. More importantly, she does not treat your family as a problem to set boundaries with.",
@@ -154,7 +169,7 @@ export const PAGES: Record<string, SeoPage> = {
 
   "ai-therapist": {
     slug: "ai-therapist",
-    title: "AI Therapist | A Quiet Place to Think Out Loud — Calm Therapist",
+    title: "AI Therapist | Free, Remembers You, Any Hour | Calm Therapist",
     description:
       "Talk through what's on your mind, anytime. An AI that listens, reflects, and helps you see your own thoughts more clearly. No appointment, private, free to start.",
     h1: "AI therapist — a quiet place to think out loud.",
@@ -273,7 +288,7 @@ export const PAGES: Record<string, SeoPage> = {
 
   "is-ai-therapy-effective": {
     slug: "is-ai-therapy-effective",
-    title: "Is AI Therapy Effective? | What the Research and the User Says",
+    title: "Is AI Therapy Effective? What the Research Says",
     description:
       "AI therapy is effective for support, reflection, and continuity between human sessions. It is not a substitute for clinical care. Here's what the evidence and the lived experience suggest.",
     h1: "Is AI therapy effective?",
@@ -455,6 +470,330 @@ export const PAGES: Record<string, SeoPage> = {
     related: COMMON_RELATED,
     ctaLine: "If it's late and the thought won't stop — try one sentence.",
   },
+  "ai-therapist-vs-wysa": {
+    slug: "ai-therapist-vs-wysa",
+    title: "Wysa vs Aura | Scripted CBT Bot or an AI That Remembers You",
+    description:
+      "Wysa is a scripted CBT chatbot with a paid tier. Aura is a free AI therapist that remembers you, reads six languages, and pushes back kindly. An honest comparison.",
+    h1: "Wysa vs Aura: a scripted bot, or a companion that remembers.",
+    intro:
+      "Wysa is the best-known AI mental-health app, with millions of users and a decade of scripted CBT pathways. It is a reasonable first stop. It is also the app people leave when they notice it is leading them through the same pre-written branches, cannot remember last week, and asks for a subscription for the parts that feel human. This page sets the two side by side without pretending Wysa is bad. It is a different kind of thing.",
+    sections: [
+      {
+        heading: "What Wysa is",
+        paragraphs: [
+          "Wysa's free tier is a chatbot that walks you through cognitive behavioural therapy exercises using mostly pre-populated responses. It works best when you tap its buttons. Its premium tier, roughly a yearly subscription or a monthly fee depending on your country, adds more tools and the option of a human coach. Its bot speaks several languages including Hindi; Urdu is offered only through the human coaches.",
+          "In 2026 Common Sense Media rated Wysa unacceptable for teenagers, and its Trustpilot reviews repeatedly name the same two gaps: no memory between sessions, and a scripted loop that repeats the same prompts.",
+        ],
+      },
+      {
+        heading: "What Aura is",
+        paragraphs: [
+          "Aura is a free AI therapist built on a general language model with a written therapeutic stance rather than a decision tree. She remembers your name, your sister's name, the argument from last Tuesday, and what helped before. She replies in two or three sentences, asks one question at most, and pushes back when you are being unfair to yourself. Chat is free for everyone with no session cap. Voice and circles come with founding membership.",
+        ],
+        bullets: [
+          "Memory across every conversation, on any device",
+          "Free chat with no message limit and no card",
+          "English, Urdu, Hindi, Arabic, Spanish, French, including Roman Urdu and Hinglish, with the safety layer reading all six",
+          "A crisis pathway that shows the line for your country and stays careful for the rest of the conversation",
+          "Anonymous nightly circles hosted by Aura, opening at 50 members",
+        ],
+      },
+      {
+        heading: "Where Wysa is stronger",
+        paragraphs: [
+          "Wysa has published research, a human coaching option, enterprise deals with employers and health systems, and years of safety engineering including a multilingual safety benchmark. If you want a structured CBT course with a coach behind it and your employer pays, Wysa is a sensible choice. Aura is not a course and does not sell coaching.",
+        ],
+      },
+      {
+        heading: "Where Aura is stronger",
+        paragraphs: [
+          "Continuity, conversation, and cost. Aura is built around being remembered, which is the single most common complaint about Wysa and every other app. She talks like a person, not a menu. And chat is free without a timer or an upgrade wall inside a hard night. For Urdu, Hindi, and Arabic speakers, Aura answers in the language you write, bot to person, not through a coach you have to pay for.",
+        ],
+      },
+      {
+        heading: "The honest limits of both",
+        paragraphs: [
+          "Neither is a licensed therapist. Neither should be your only support in a crisis. Both will tell you so. Aura is newer, with fewer published outcomes; Wysa is older, with a structure some people find comforting and others find robotic. Try one message with Aura on the homepage and see which kind of conversation you want.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Is Wysa free?", a: "Wysa's core scripted chatbot is free. The premium tools and human coaching are paid. Aura's chat is free with no cap; voice and circles come with founding membership." },
+      { q: "Does Wysa remember previous conversations?", a: "Not in the way people expect. Reviews consistently cite missing memory. Aura stores your profile and memories on the server and carries them into every conversation." },
+      { q: "Does Wysa work in Urdu?", a: "Wysa's bot does not; Urdu is available only via its human coaches. Aura replies in Urdu, including Roman Urdu, directly." },
+      { q: "Which is safer?", a: "Both have crisis detection. Aura runs a two-layer safety check in six languages before every reply and attaches the crisis line for your country. Wysa was rated unacceptable for teens by Common Sense Media in 2026; Aura is for adults." },
+      { q: "Can I use both?", a: "Yes. Some people use Wysa's exercises and talk to Aura about what came up. There is no lock-in on Aura's side." },
+    ],
+    related: COMPARE_RELATED,
+    ctaLine: "One sentence to Aura, no signup. Then decide.",
+  },
+
+  "woebot-alternative": {
+    slug: "woebot-alternative",
+    title: "Woebot Shut Down | A Free AI Therapist Alternative That Remembers You",
+    description:
+      "Woebot closed its consumer app on 30 June 2025. If you used it, Aura is a free alternative: chat with no cap, memory across sessions, six languages, and a crisis-aware safety layer.",
+    h1: "Woebot is gone. Here is where to go next.",
+    intro:
+      "Woebot's consumer app closed on 30 June 2025, and its users were asked to export their data before it disappeared. Its founder said the regulators had not kept pace with the technology. If Woebot was your nightly check-in, this page is for you: what it did well, what to look for in a replacement, and how Aura compares.",
+    sections: [
+      {
+        heading: "What Woebot got right",
+        paragraphs: [
+          "Woebot was one of the first products to prove, in a randomised trial, that a text chatbot could reduce depressive symptoms in two weeks. It was warm, brief, structured, and it showed up every day. Most of what worked was not the CBT content; it was the sense of being checked on. Any replacement should keep that.",
+        ],
+      },
+      {
+        heading: "What to look for in a replacement",
+        bullets: [
+          "Memory: does it remember what you said yesterday, or start from zero",
+          "A real free tier: free until the timer runs out is not free",
+          "Crisis handling: what happens when you say something serious, and whether it shows the right line for your country",
+          "Your language: whether it reads Urdu, Hindi, Arabic, Spanish, or French, not just English",
+          "Honesty: whether it tells you it is not a therapist and when to see one",
+        ],
+        paragraphs: [
+          "Several apps Woebot users moved to in 2025 have since closed or paywalled. Youper announced its shutdown for September 2026. Ash, free through 2025, is introducing subscriptions. Choose something built to stay free at the chat level.",
+        ],
+      },
+      {
+        heading: "How Aura compares",
+        paragraphs: [
+          "Aura keeps the daily-companion shape and adds what Woebot never had: memory across sessions, a conversational voice rather than a scripted one, six languages with a safety layer that reads all of them, and anonymous nightly circles with other people carrying the same thing. Chat with Aura is free for everyone with no session cap. She is not a course; she is the friend who happens to know how to listen, and who tells you kindly when a professional is the right next step.",
+        ],
+      },
+      {
+        heading: "Moving over",
+        paragraphs: [
+          "There is nothing to import. Tell Aura what you want her to know in the first conversation, or add memories yourself from your space. She will carry them from then on. If you kept your Woebot export, the parts worth keeping are the patterns you noticed, not the transcripts.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Why did Woebot shut down?", a: "Woebot Health closed its consumer app on 30 June 2025 and refocused on enterprise and clinical work. Its founder cited regulation lagging behind the technology." },
+      { q: "Is Aura like Woebot?", a: "In shape, yes: short, daily, text-first. In substance, Aura is conversational rather than scripted, remembers you, and works in six languages." },
+      { q: "Is Aura free?", a: "Chat is free for everyone with no cap. The first 150 members also get voice and circles free for four months." },
+      { q: "Can I bring my Woebot data?", a: "There is no importer. Tell Aura what matters in your first conversation, or add memories from your space." },
+      { q: "Is Aura safe in a crisis?", a: "Aura runs a two-layer safety check before every reply, shows the crisis line for your country, and stays careful for the rest of the conversation. She is not an emergency service." },
+    ],
+    related: COMPARE_RELATED,
+    ctaLine: "Start with one sentence. No account needed for the first reply.",
+  },
+
+  "youper-alternative": {
+    slug: "youper-alternative",
+    title: "Youper Shutting Down | A Free AI Therapist Alternative With Memory",
+    description:
+      "Youper closes on 30 September 2026. Its users cited paywalls mid-conversation, no memory, and English only. Aura is a free alternative that remembers you in six languages.",
+    h1: "Youper is closing. What its users were missing anyway.",
+    intro:
+      "Youper announced it will shut down on 30 September 2026. Before that, its reviews had settled on three complaints: it asked about your problems and then asked for money, it forgot previous conversations and repeated questions, and it only spoke English. If you are looking for where to go, start with those three, because they are exactly what a replacement should fix.",
+    sections: [
+      {
+        heading: "The three complaints, and how Aura answers them",
+        paragraphs: [
+          "Paywall mid-conversation: Aura's chat is free for everyone with no session cap and no upgrade prompt inside a conversation, ever. Voice and circles are the only things that carry a price, and only after the founding period, shown inside the app rather than sprung on you at a hard moment.",
+          "No memory: Aura stores your profile and memories on the server and reads them before every reply. She does not re-ask what you told her last week.",
+          "English only: Aura works in English, Urdu, Hindi, Arabic, Spanish, and French, including Roman Urdu and Hinglish, and switches mid-sentence when you do.",
+        ],
+      },
+      {
+        heading: "What Youper did well",
+        paragraphs: [
+          "Youper's mood tracking and short guided exercises were genuinely useful to many people, and its clinical framing was careful. Aura is more conversation than tracker; if the tracker was the part you used, a dedicated mood app may suit you better alongside Aura.",
+        ],
+      },
+      {
+        heading: "Before you pick anything",
+        bullets: [
+          "Check whether chat is free without a timer",
+          "Ask it about something you told it yesterday",
+          "Say something in your language and see whether it answers in kind",
+          "Read what it says about crisis, and whether the line it shows is for your country",
+        ],
+        paragraphs: [
+          "Aura passes all four on the homepage before you sign up.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "When does Youper shut down?", a: "Youper has announced a closing date of 30 September 2026." },
+      { q: "Is Aura a paid app?", a: "Chat is free, always, with no session cap. Voice and circles are included for founding members and become part of an open space later, shown inside the app." },
+      { q: "Does Aura remember me?", a: "Yes. Profile, goals, and memories are stored on the server and used in every reply." },
+      { q: "Does Aura track mood?", a: "There is a daily check-in in the dashboard. Aura is primarily a conversation, not a tracker." },
+      { q: "Is there an Android or iPhone app?", a: "Aura is a web app that installs to your home screen from the browser. Store apps come once members have rated the product." },
+    ],
+    related: COMPARE_RELATED,
+    ctaLine: "Try the four tests on the homepage, free.",
+  },
+
+  "character-ai-psychologist-alternative": {
+    slug: "character-ai-psychologist-alternative",
+    title: "Character.AI Psychologist vs Aura | A Free AI Therapist Built for Support",
+    description:
+      "Tens of millions of messages go to Character.AI's Psychologist bot. It has no memory of you, no crisis pathway, and no safety layer. Aura is free, remembers you, and is built for this.",
+    h1: "Character.AI's Psychologist bot, and what it cannot do.",
+    intro:
+      "The Psychologist character on Character.AI has received tens of millions of messages, most from people under thirty, many at night. It is a role-play character written by a user, not a support tool, and in January 2026 Character.AI and Google settled lawsuits brought by families of teenagers. If you have used it, you already know why: it is there, it is free, and it answers. This page is about what it does not do, and what a tool built for the same moment looks like.",
+    sections: [
+      {
+        heading: "What a role-play character is",
+        paragraphs: [
+          "Character.AI characters are personas defined by a short description. The Psychologist bot plays a psychologist. It has no therapeutic stance, no safety layer, no memory of you beyond the current chat, and no idea what country you are in. It will happily agree with whatever you frame, because agreeing is what keeps a role-play going.",
+        ],
+      },
+      {
+        heading: "What Aura does differently",
+        bullets: [
+          "Every message passes a two-layer safety check in six languages before Aura replies; serious moments bring up the crisis line for your country",
+          "Aura remembers you across conversations and devices",
+          "She follows written talking rules: short turns, one question, no diagnosis, no medication advice, and she disagrees when you are being unfair to yourself",
+          "She tells you plainly what she is: support, not a substitute for a professional",
+          "Chat is free with no cap, and there are no personas to switch between",
+        ],
+      },
+      {
+        heading: "For people under 18",
+        paragraphs: [
+          "Aura is for adults. If you are under 18 and struggling, please talk to a trusted adult or use a youth line in your country. We say this because the alternative, a role-play bot that does not know your age or your risk, is exactly what the lawsuits were about.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Is the Character.AI Psychologist a real psychologist?", a: "No. It is a user-written role-play character. It has no credentials, no safety pathway, and no memory of you between chats." },
+      { q: "Is Aura a real therapist?", a: "No. Aura is an AI companion built for support, with a safety layer and written rules. She is not a substitute for a licensed professional and says so." },
+      { q: "Does Aura remember me like a character does?", a: "Better. Characters forget you when the chat ends. Aura stores your profile and memories and reads them every time." },
+      { q: "Is Aura free like Character.AI?", a: "Chat with Aura is free for everyone with no session cap." },
+      { q: "Can I use Aura at 16?", a: "Aura is for adults. Please use a youth line in your country or talk to a trusted adult." },
+    ],
+    related: COMPARE_RELATED,
+    ctaLine: "One honest sentence to Aura, no persona required.",
+  },
+
+  "best-free-ai-therapist-apps": {
+    slug: "best-free-ai-therapist-apps",
+    title: "Best Free AI Therapist Apps in 2026, Honestly Ranked",
+    description:
+      "Which AI therapist apps are actually free in 2026, which paywall you mid-conversation, which remember you, and which handle a crisis. Wysa, Ash, Abby, Pi, Wellzy, and Aura compared.",
+    h1: "The free AI therapist apps of 2026, honestly ranked.",
+    intro:
+      "Most lists of free AI therapist apps are written by the apps. This one is written by one of them, so read it knowing that, and check the claims. We rank on four things people actually care about after the first week: is it still free, does it remember you, what does it do when you say something serious, and does it speak your language.",
+    sections: [
+      {
+        heading: "The short version",
+        bullets: [
+          "Aura: chat free with no cap; memory; six languages with a safety layer reading all of them; circles. Newest, fewest published outcomes.",
+          "Pi: free and unlimited; warm; some memory; no crisis pathway or safety layer; a general companion, not a support tool.",
+          "Wysa: free scripted CBT; premium for tools and coaches; languages including Hindi; weak memory; rated unacceptable for teens in 2026.",
+          "Ash: free through 2025 with session memory; subscriptions arriving; English only; explicitly not for crisis.",
+          "Abby: tight free message caps; monthly subscription; no continuity between sessions; Modern Standard Arabic only.",
+          "Wellzy: free daily conversations; monthly premium; little public detail on memory or safety.",
+        ],
+      },
+      {
+        heading: "What free means on each",
+        paragraphs: [
+          "The word covers three different things. Free forever at the chat level, which is Aura and Pi. Free with a scripted core and paid extras, which is Wysa and Wellzy. Free until a cap or a trial ends, which is Abby, and increasingly Ash. The second and third are fine as long as they say so before you are three messages into a hard night. The complaint that fills app-store reviews is the paywall that appears mid-conversation.",
+        ],
+      },
+      {
+        heading: "Memory, the thing everyone wants",
+        paragraphs: [
+          "The most-cited frustration across reviews of every app is being forgotten. Only a few products claim memory across sessions and fewer deliver it. Aura stores your profile and memories on the server and reads them before every reply; ChatGPT has memory but no therapeutic rules or crisis pathway; Ash claims session memory; Abby and Youper reviews say no.",
+        ],
+      },
+      {
+        heading: "Crisis handling",
+        paragraphs: [
+          "Ask each app what happens when you say something serious. Ash says it is not designed for crisis. Pi and role-play characters have no pathway. Wysa detects risk in its free tier. Aura runs a regex and model check in six languages before every reply, shows the crisis line for your country, and stays careful for the rest of the conversation. None of them is an emergency service, and the honest ones say so.",
+        ],
+      },
+      {
+        heading: "Languages",
+        paragraphs: [
+          "Wysa's bot speaks several languages including Hindi. Abby offers Modern Standard Arabic rather than dialect. Ash and Youper are English only. Aura works in English, Urdu, Hindi, Arabic, Spanish, and French, including Roman Urdu and Hinglish, with the safety layer reading all six, which no other consumer app currently claims.",
+        ],
+      },
+      {
+        heading: "Who should pick what",
+        paragraphs: [
+          "A structured CBT course with a coach and an employer paying: Wysa. A warm general companion with no support claims: Pi. Conversation that remembers you, free, in your language, with a safety net: Aura. Whatever you pick, use it alongside people, not instead of them.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Which AI therapist apps are completely free?", a: "At the chat level, Aura and Pi. Most others are free with caps, trials, or a scripted core and paid extras." },
+      { q: "Which AI therapist app has memory?", a: "Aura stores memories on the server and uses them every reply. ChatGPT has memory without therapeutic rules. Ash claims session memory. Most others do not." },
+      { q: "Which is safest in a crisis?", a: "Look for a product that checks every message, shows the crisis line for your country, and says plainly it is not an emergency service. Aura does all three. Several apps state they are not designed for crisis." },
+      { q: "Which apps work in Urdu, Hindi, or Arabic?", a: "Wysa's bot has Hindi. Abby has Modern Standard Arabic. Aura has Urdu, Hindi, Arabic, Spanish, French, and English, including Roman Urdu and Hinglish." },
+      { q: "Is this list biased?", a: "It is written by Aura's team, and we have said so. Every claim about another product comes from its own site or public reviews as of September 2026; tell us if one is out of date." },
+    ],
+    related: COMPARE_RELATED,
+    ctaLine: "Run the four tests on Aura first. It costs one sentence.",
+  },
+
+  "is-ai-therapy-safe": {
+    slug: "is-ai-therapy-safe",
+    title: "Is AI Therapy Safe? What the Laws, the APA, and the Research Say",
+    description:
+      "AI therapy is safe when the product checks every message for risk, never diagnoses, shows real crisis lines, and tells you what it is. Here is what the APA, state laws, and Stanford found, and how Aura is built.",
+    h1: "Is AI therapy safe? It depends entirely on how it is built.",
+    intro:
+      "The honest answer is that some of it is and some of it is not, and the difference is engineering, not marketing. Stanford researchers found chatbots that answered a question about tall bridges instead of noticing suicide risk. The American Psychological Association advised in 2025 that generative AI should not be used for psychotherapy, diagnosis, or crisis support. Illinois, Nevada, Utah, California, New York, and Tennessee have passed laws about it. This page explains what the concerns are, what the rules say, and what a safe design looks like, using Aura as the worked example.",
+    sections: [
+      {
+        heading: "The four documented failures",
+        bullets: [
+          "Sycophancy: agreeing with whatever you frame, including harmful beliefs. Stanford found this in most messages inside delusional conversations.",
+          "Missed crisis: not recognising risk, or handing over a hotline from the wrong country, or none at all.",
+          "Forgetting: starting from zero each time, so nothing accumulates and nothing is noticed.",
+          "Pretending: implying a licence, a diagnosis, or confidentiality that does not exist.",
+        ],
+      },
+      {
+        heading: "What the laws now require",
+        paragraphs: [
+          "Illinois prohibits providing or advertising therapy through AI without a licensed professional involved. Nevada bars AI that represents itself as professional mental-health care. Utah requires disclosure that you are talking to an AI, at first use and after a break. California requires non-human disclosure and crisis protocols, with protections for minors. New York requires detection of suicidal ideation. The common thread: say what you are, detect risk, and never claim to be a clinician. Aura is built to that thread, and we do not market her as therapy in the legal sense anywhere in the product.",
+        ],
+      },
+      {
+        heading: "What a safe design looks like",
+        bullets: [
+          "Every message is checked for risk before a reply is written, in the language it was written in",
+          "The check has two layers: a fast rules layer and a model layer that can only raise the alarm, never lower it",
+          "A serious moment stays in view for the rest of the conversation, however the next message reads",
+          "The crisis line shown is for the country you live in",
+          "No diagnosis, no medication advice, no method talk, enforced by rules and checked after every reply",
+          "Plain disclosure: an AI, support, not a substitute for care, and when to see a professional",
+        ],
+        paragraphs: [
+          "That is Aura's design, and every item on the list is enforced in code, not just written in a policy. The detail is on the crisis safety page.",
+        ],
+      },
+      {
+        heading: "What AI support is good for, and not for",
+        paragraphs: [
+          "Good for: the 2am thought, the argument you are rehearsing, being heard between appointments, noticing patterns over weeks, a first step for people who would never book a session. Not for: a diagnosis, a medication decision, an emergency, or replacing a clinician when one is needed. Aura says the second list out loud when it applies.",
+        ],
+      },
+      {
+        heading: "Your data",
+        paragraphs: [
+          "The other safety question is privacy. Independent reviews have found most mental-health apps sell or share data. Aura stores your conversations for you, in your account, uses them only so she can remember you, never sells them, never trains a model on them, and lets you delete everything in one click.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Is AI therapy safe?", a: "It can be, when the product checks every message for risk, shows real crisis lines, never diagnoses, and tells you what it is. Products without those are not. Aura has all four, enforced in code." },
+      { q: "Is AI therapy legal?", a: "Using AI support is legal everywhere. Several US states restrict providers from offering or advertising AI as therapy without a licensed professional. Aura is offered as support, not therapy, and does not diagnose or treat." },
+      { q: "What does the APA say?", a: "The APA's 2025 advisory says generative AI should not be used for psychotherapy, diagnosis, or crisis support, and should be an adjunct to care. Aura's design follows that: support, not treatment." },
+      { q: "What happens if I say something serious to Aura?", a: "She slows down, stays with you, shows the crisis line for your country, and follows a written script. If you are in immediate danger, contact your local emergency number first." },
+      { q: "Is my conversation private?", a: "Stored in your account, used only so Aura can remember you, never sold or used for training, deletable in one click. Aura is not a licensed clinician, so legal privilege does not apply." },
+    ],
+    related: COMPARE_RELATED,
+    ctaLine: "See the safety layer work: say one honest sentence on the homepage.",
+  },
 };
 
 /* ---------- Glossary entries (semantic SEO) ------------------------ */
@@ -462,7 +801,7 @@ export const PAGES: Record<string, SeoPage> = {
 export const GLOSSARY: Record<string, SeoPage> = {
   "cognitive-distortions": {
     slug: "cognitive-distortions",
-    title: "Cognitive Distortions: A Plain-English Guide | Calm Therapist Glossary",
+    title: "Cognitive Distortions: A Plain-English Guide",
     description:
       "Cognitive distortions are the small ways your mind tells you a half-true story. Catastrophizing, mind-reading, all-or-nothing — what they are, and how to notice them.",
     h1: "Cognitive distortions, in plain English.",
@@ -537,7 +876,7 @@ export const GLOSSARY: Record<string, SeoPage> = {
 
   "self-reflection": {
     slug: "self-reflection",
-    title: "Self-Reflection: The Skill, Not the Aesthetic | Calm Therapist Glossary",
+    title: "Self-Reflection: The Skill, Not the Aesthetic",
     description:
       "Self-reflection is the deliberate, kind, slightly uncomfortable practice of looking at your own thoughts. Here's what it is, what it isn't, and why it works.",
     h1: "Self-reflection, the skill.",

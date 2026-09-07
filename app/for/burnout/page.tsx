@@ -2,7 +2,7 @@ import { ConditionPageTemplate } from "@/components/seo/ConditionPage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "AI Therapy for Burnout | Calm Therapist — When You're Falling Apart Quietly",
+  title: "AI Therapist for Burnout | Falling Apart Quietly | Calm Therapist",
   description:
     "AI therapy for burnout. Calm Therapist surfaces your patterns — sleep, work, weekends — and helps you see what you've been ignoring.",
   path: "/for/burnout",

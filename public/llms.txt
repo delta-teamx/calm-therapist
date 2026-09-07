@@ -1,0 +1,24 @@
+# Calm Therapist
+
+> A free AI therapist called Aura. Chat is free for everyone with no session cap. Voice when typing is too much. Small anonymous nightly text circles hosted by Aura, opening at 50 members. Crisis-aware from the first message, with the crisis line for the member's country. English, Urdu, Hindi, Arabic, Spanish, and French, including Roman Urdu and Hinglish. Not a substitute for care from a licensed professional.
+
+## Start here
+- [What is an AI therapist?](/what-is-an-ai-therapist)
+- [Free AI therapist, without the catch](/free-ai-therapist)
+- [AI therapist in your language](/ai-therapist-in-your-language)
+- [Circles: small anonymous groups hosted by Aura](/circles)
+- [How it works](/how-it-works)
+
+## Comparisons
+- [AI therapist vs ChatGPT](/ai-therapist-vs-chatgpt)
+- [AI therapist vs a human therapist](/ai-therapist-vs-human-therapist)
+- [AI therapist vs BetterHelp](/ai-therapist-vs-betterhelp)
+
+## Safety and privacy
+- [Crisis safety](/features/crisis)
+- [Privacy](/privacy)
+- [Terms](/terms)
+
+## Feed
+- [Blog](/blog)
+- [RSS](/feed.xml)

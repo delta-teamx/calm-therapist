@@ -2,7 +2,7 @@ import { ConditionPageTemplate } from "@/components/seo/ConditionPage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "AI Therapy for Relationships | Calm Therapist — See the Pattern Clearly",
+  title: "AI Therapist for Relationships | See the Pattern | Calm Therapist",
   description:
     "AI therapy for relationships. Calm Therapist surfaces the pattern across your conversations, partners, and family — not just one fight at a time.",
   path: "/for/relationships",

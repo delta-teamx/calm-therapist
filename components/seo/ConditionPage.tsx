@@ -1,6 +1,7 @@
 import { Style } from "@/components/ui/Style";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { PageShell } from "@/components/seo/PageShell";
 import { JsonLd, faqSchema, breadcrumbSchema } from "@/lib/seo";
 
@@ -33,6 +34,7 @@ export function ConditionPageTemplate(p: ConditionPageProps) {
           <p className="micro-label micro-label-bordered" style={{ marginBottom: 24 }}>
             For {p.condition.toLowerCase()}
           </p>
+          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "For", href: "/for/anxiety" }, { name: p.condition }]} />
           <h1 style={{ marginBottom: 24 }}>{p.h1}</h1>
           <p className="body-large" style={{ color: "var(--calm-ink-40)" }}>
             Calm Therapist is built around how {p.condition.toLowerCase()} actually works — memory,

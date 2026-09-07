@@ -2,7 +2,7 @@ import { ConditionPageTemplate } from "@/components/seo/ConditionPage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "AI Therapy for Anxiety | Calm Therapist — Memory, Voice, and Real Help",
+  title: "AI Therapist for Anxiety | Free, Remembers You | Calm Therapist",
   description:
     "AI therapy designed for anxiety. Voice-first when typing is too much, full session memory, and a longitudinal record so you don't start over every time.",
   path: "/for/anxiety",

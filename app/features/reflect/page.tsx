@@ -2,7 +2,7 @@ import { FeaturePageTemplate } from "@/components/seo/FeaturePage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Monthly Reflect AI Therapy | Calm Therapist — Real Progress, Not Performance",
+  title: "Monthly Reflect | Real Progress, Not Performance | Calm Therapist",
   description:
     "Monthly Reflect by Calm Therapist gives you a real summary of your inner life across the month. See your shift, your themes, and your own quotes back to you.",
   path: "/features/reflect",

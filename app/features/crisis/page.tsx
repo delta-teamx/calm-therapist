@@ -2,7 +2,7 @@ import { FeaturePageTemplate } from "@/components/seo/FeaturePage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Crisis Safe AI Therapy | Calm Therapist — Real Human Backup When It Matters",
+  title: "Crisis Safety | How Aura Handles the Hard Nights | Calm Therapist",
   description:
     "When things get serious. Calm Therapist's Crisis Safe mode grounds you, surfaces verified crisis resources, and connects you to a real person within minutes.",
   path: "/features/crisis",

@@ -11,6 +11,9 @@ export interface UserRecord {
   isAdmin: boolean;
   /** 1-based order of signup. Drives founding access (see lib/access.ts). */
   memberNumber?: number;
+  /** First-touch attribution captured at signup. */
+  signupLanding?: string;
+  signupReferrer?: string;
   createdAt: string;
   emailVerified?: string;
   emailOptOut: boolean;
@@ -135,7 +138,7 @@ void seedAdmin();
 /* Create / read                                                       */
 /* ------------------------------------------------------------------ */
 
-async function createDbUser(data: { email: string; name: string; passwordHash: string }): Promise<UserRecord> {
+async function createDbUser(data: { email: string; name: string; passwordHash: string; signupLanding?: string; signupReferrer?: string }): Promise<UserRecord> {
   // Member number = count + 1. The unique constraint catches a concurrent
   // signup; retry once with a fresh count.
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -153,7 +156,12 @@ async function createDbUser(data: { email: string; name: string; passwordHash: s
   throw new Error("MEMBER_NUMBER_RACE");
 }
 
-export async function createUser(input: { email: string; password: string; name: string }): Promise<UserRecord> {
+export interface SignupSource {
+  landing?: string;
+  referrer?: string;
+}
+
+export async function createUser(input: { email: string; password: string; name: string; source?: SignupSource }): Promise<UserRecord> {
   if (input.password.length < 8) throw new Error("PASSWORD_TOO_SHORT");
   const k = key(input.email);
   const passwordHash = await bcrypt.hash(input.password, 10);
@@ -162,7 +170,7 @@ export async function createUser(input: { email: string; password: string; name:
   if (dbEnabled) {
     const existing = await prisma.user.findUnique({ where: { email: k } });
     if (existing) throw new Error("EMAIL_TAKEN");
-    return createDbUser({ email: k, name: trimmedName, passwordHash });
+    return createDbUser({ email: k, name: trimmedName, passwordHash, signupLanding: input.source?.landing, signupReferrer: input.source?.referrer });
   }
 
   if (memoryStore.has(k)) throw new Error("EMAIL_TAKEN");
@@ -323,6 +331,8 @@ export async function setEmailOptOut(userId: string, optOut: boolean): Promise<v
 
 interface PrismaUserRow {
   id: string;
+  signupLanding?: string | null;
+  signupReferrer?: string | null;
   email: string;
   name: string;
   passwordHash: string;
@@ -350,6 +360,8 @@ function rowToRecord(row: PrismaUserRow): UserRecord {
     plan: row.plan === "pro" ? "pro" : "free",
     isAdmin: row.isAdmin,
     memberNumber: row.memberNumber ?? undefined,
+    signupLanding: row.signupLanding ?? undefined,
+    signupReferrer: row.signupReferrer ?? undefined,
     createdAt: row.createdAt.toISOString(),
     emailVerified: row.emailVerified?.toISOString(),
     emailOptOut: row.emailOptOut,

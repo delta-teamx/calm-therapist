@@ -2,7 +2,7 @@ import { FeaturePageTemplate } from "@/components/seo/FeaturePage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Voice Agent AI Therapy | Calm Therapist — Talk When Typing Is Too Much",
+  title: "Voice AI Therapist | Talk When Typing Is Too Much | Calm Therapist",
   description:
     "Voice-based AI therapy that listens, reflects, and remembers. Calm Therapist's voice agent is built for the moments you can't type — anxiety, exhaustion, grief, or just walking.",
   path: "/features/voice",

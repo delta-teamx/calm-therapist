@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 
 const DASHBOARD_SUBDOMAIN = process.env.DASHBOARD_SUBDOMAIN ?? "relax";
+const SOURCE_COOKIE = "calm_src";
 
 // Paths that bypass the relax-subdomain rewrite (they live at the original path).
 const REWRITE_PASSTHROUGH = [
@@ -65,12 +66,18 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // If we set a rewrite earlier, return that.
-  if (url.pathname !== req.nextUrl.pathname) {
-    return NextResponse.rewrite(url);
+  // First-touch source for signup attribution: landing path, referrer, and
+  // utm tags, kept in a small cookie until the visitor signs up.
+  const res = url.pathname !== req.nextUrl.pathname ? NextResponse.rewrite(url) : NextResponse.next();
+  const isPage = req.method === "GET" && !pathname.startsWith("/api") && !pathname.startsWith("/_next") && !pathname.includes(".");
+  if (isPage && !req.cookies.get(SOURCE_COOKIE)) {
+    const ref = req.headers.get("referer") ?? "";
+    const sameSite = ref && (() => { try { return new URL(ref).host === host; } catch { return false; } })();
+    const utm = ["utm_source", "utm_medium", "utm_campaign"].map((k) => req.nextUrl.searchParams.get(k)).filter(Boolean).join("/");
+    const value = JSON.stringify({ l: pathname.slice(0, 120), r: sameSite ? "" : ref.slice(0, 200), u: utm.slice(0, 120) });
+    res.cookies.set(SOURCE_COOKIE, value, { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax", httpOnly: true });
   }
-
-  return NextResponse.next();
+  return res;
 }
 
 export const config = {
