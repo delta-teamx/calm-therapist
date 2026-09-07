@@ -39,7 +39,6 @@ export function organizationSchema() {
     parentOrganization: { "@type": "Organization", name: BRAND.parent.name, url: BRAND.parent.url },
     sameAs: [BRAND.parent.url, ...(process.env.NEXT_PUBLIC_SOCIAL_URLS ?? "").split(",").map((s) => s.trim()).filter(Boolean)],
     description: BRAND.description,
-    ...(process.env.NEXT_PUBLIC_AUTHOR_NAME ? { founder: { "@type": "Person", name: process.env.NEXT_PUBLIC_AUTHOR_NAME } } : {}),
   };
 }
 
@@ -55,56 +54,9 @@ export function webSiteSchema() {
   };
 }
 
-/** The named human behind the pages. Set NEXT_PUBLIC_AUTHOR_NAME and NEXT_PUBLIC_AUTHOR_URL. */
+/** Articles are published by the organisation, not a named person. */
 export function authorSchema() {
-  const name = process.env.NEXT_PUBLIC_AUTHOR_NAME;
-  if (!name) return { "@type": "Organization", name: BRAND.name, url: BASE_URL };
-  return {
-    "@type": "Person",
-    name,
-    url: process.env.NEXT_PUBLIC_AUTHOR_URL || `${BASE_URL}/about`,
-    ...(process.env.NEXT_PUBLIC_AUTHOR_TITLE ? { jobTitle: process.env.NEXT_PUBLIC_AUTHOR_TITLE } : {}),
-  };
-}
-
-/** The about page as a ProfilePage for the named founder; only when a name is configured. */
-export function profilePageSchema() {
-  const name = process.env.NEXT_PUBLIC_AUTHOR_NAME;
-  if (!name) return null;
-  return {
-    "@context": "https://schema.org",
-    "@type": "ProfilePage",
-    mainEntity: {
-      "@type": "Person",
-      name,
-      ...(process.env.NEXT_PUBLIC_AUTHOR_TITLE ? { jobTitle: process.env.NEXT_PUBLIC_AUTHOR_TITLE } : {}),
-      url: `${BASE_URL}/about`,
-      worksFor: { "@type": "Organization", name: BRAND.parent.name, url: BRAND.parent.url },
-      sameAs: (process.env.NEXT_PUBLIC_SOCIAL_URLS ?? "").split(",").map((s) => s.trim()).filter(Boolean),
-    },
-  };
-}
-
-/**
- * A reviewed health page. Emits nothing until a clinical reviewer is
- * configured, so the site never claims a review it did not have.
- */
-export function reviewedPageSchema(args: { path: string; name: string; lastReviewed?: string }) {
-  const reviewer = process.env.NEXT_PUBLIC_REVIEWER_NAME;
-  if (!reviewer) return null;
-  return {
-    "@context": "https://schema.org",
-    "@type": "MedicalWebPage",
-    name: args.name,
-    url: `${BASE_URL}${args.path}`,
-    lastReviewed: args.lastReviewed ?? process.env.NEXT_PUBLIC_CONTENT_UPDATED ?? "2026-09-05",
-    reviewedBy: {
-      "@type": "Person",
-      name: reviewer,
-      ...(process.env.NEXT_PUBLIC_REVIEWER_TITLE ? { jobTitle: process.env.NEXT_PUBLIC_REVIEWER_TITLE } : {}),
-    },
-    about: { "@type": "MedicalCondition", name: "Mental health" },
-  };
+  return { "@type": "Organization", name: BRAND.name, url: BASE_URL };
 }
 
 export function faqSchema(faqs: { q: string; a: string }[]) {

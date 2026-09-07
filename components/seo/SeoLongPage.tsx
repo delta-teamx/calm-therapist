@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageShell } from "@/components/seo/PageShell";
-import { JsonLd, breadcrumbSchema, faqSchema, reviewedPageSchema } from "@/lib/seo";
+import { JsonLd, breadcrumbSchema, faqSchema } from "@/lib/seo";
 import type { SeoPage } from "@/lib/seo-pages";
 import { BRAND } from "@/lib/brand";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
@@ -21,7 +21,6 @@ export function SeoLongPage({ page, path }: Props) {
         ])}
       />
       <JsonLd data={faqSchema(page.faqs)} />
-      {(() => { const r = reviewedPageSchema({ path, name: page.h1 }); return r ? <JsonLd data={r} /> : null; })()}
 
       <article className="section">
         <div className="container" style={{ maxWidth: 760 }}>
