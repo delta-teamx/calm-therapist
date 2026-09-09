@@ -112,21 +112,29 @@ GOOGLE_REDIRECT_URI     <NEXT_PUBLIC_APP_URL>/api/auth/google/callback
 
 The redirect URI must be registered in Google Cloud, character for character.
 
-### The free tier and the support tiers
+### The free tier, and what we deliver for what arrives
 
 ```
 FREE_CHAT_MESSAGES_PER_DAY   120   fair-use cap on free chat, not a paywall
 FREE_JOURNAL_READS_PER_WEEK  3     LLM-backed journal reads
 FOUNDING_MEMBER_CAP          150   badge only; grants no access
 MIN_SUPPORT_USD              3
-SUPPORT_MINUTES_COFFEE       15    at $3
-SUPPORT_MINUTES_SUPPORTER    60    at $10
-SUPPORT_MINUTES_PATRON       150   at $25
-SUPPORT_MINUTES_FOUNDER      300   at $50
+SUPPORT_MINUTES_COFFEE       15    delivered for $3 and up
+SUPPORT_MINUTES_SUPPORTER    60    delivered for $10 and up
+SUPPORT_MINUTES_PATRON       150   delivered for $25 and up
+SUPPORT_MINUTES_FOUNDER      300   delivered for $50 and up
 ```
 
-`tests/support.test.ts` asserts every tier stays above cost at $0.081/min with
-8% payment fees. If you raise the minutes, that test tells you when a tier
+**These bands are server-side only and are never shown to a member.** Nobody
+picks one. The popup makes a single open ask — buy the creator a coffee, from
+$3, whatever it has been worth to you — and the bands are only how the server
+decides what voice package to deliver once the money has arrived. A test
+asserts the band table never reaches the API response or the dialog, because
+the moment a member sees a ladder the ask stops being an ask and becomes a
+pricing page.
+
+`tests/support.test.ts` also asserts every band stays above cost at $0.081/min
+with 8% payment fees, so raising the minutes fails the suite before a band
 starts losing money.
 
 ### Site and SEO
@@ -161,7 +169,8 @@ member opens voice or circles
         |                      never required.
         |
         └─ gate 2 ──> GET /api/unlock issues a single-use code (AURA-XXXXXX)
-                      member pastes it into the Ko-fi message and pays
+                      one ask, no plan to pick: any amount from $3
+                      member pastes the code into the Ko-fi message and pays
                               |
                               v
                       Ko-fi POSTs /api/kofi/webhook
@@ -169,8 +178,10 @@ member opens voice or circles
                               |
                       token compared in constant time
                       deduped on message_id (the table's primary key)
-                      code matched -> SupportPass created
+                      code matched -> amount mapped to a delivery band
+                                   -> SupportPass created
                                    -> minutes added to VoiceQuota.balanceSec
+                                   -> "support-thanks" receipt queued
                                    -> code consumed, never reusable
 ```
 
@@ -184,10 +195,49 @@ end date rather than replacing it.
 
 ---
 
-## 4. Before you switch it on
+## 4. What Resend actually sends
+
+Fourteen templates, a durable queue, and a cron every five minutes
+(`render.yaml` -> `calm-therapist-emails` -> `POST /api/cron/emails`).
+
+**Transactional** — always sent, opt-out does not apply:
+`verify-email`, `password-reset`, `topup-receipt`, `support-thanks`.
+
+**Onboarding** — queued at signup and on first session:
+`welcome`, `after-first`, `day-2`, `day-7`.
+
+**Win-back** — re-armed on every session, so they only fire on real silence:
+`inactive-3d`, `inactive-7d`, `inactive-30d`.
+
+**Care** — `crisis-followup-24h`, queued after a crisis-tier conversation.
+
+**Recurring** — `weekly-reflection` and `annual-anniversary`.
+
+The weekly look-back is the only recurring engagement mail, and the cron
+re-arms it (`lib/engagement.ts`). Its rules, which are deliberately strict:
+
+- One a week at most, never two within six days.
+- Only to members who used the product in the last 30 days. People who went
+  quiet are handled by the win-back sequence and then left alone.
+- Never to an opted-out or unverified address.
+- **Nothing personal in the body.** No quotes, no themes, no mood numbers —
+  at most a count of conversations. The look-back itself lives behind the
+  login, because this mail can land in a shared inbox.
+
+That restraint is the point. Volume of unsolicited mail is the strongest
+predictor of uninstalls in this category, and tailored nudges buy only about
+4% more next-day engagement, an effect that decays over weeks. One good weekly
+mail beats five nudges.
+
+The sending domain must be verified in Resend (SPF + DKIM) or all of it lands
+in spam.
+
+---
+
+## 5. Before you switch it on
 
 - [ ] `npm run typecheck` — clean
-- [ ] `npm test` — 81 tests green
+- [ ] `npm test` — 83 tests green
 - [ ] `npm run build` — succeeds
 - [ ] Migrations applied: `npm run db:migrate` against `DATABASE_DIRECT_URL`
 - [ ] `/api/health` returns `db: ok`
@@ -197,21 +247,25 @@ end date rather than replacing it.
 - [ ] Open the unlock dialog: leave a 1-star review; confirm the gate opens anyway
 - [ ] Send yourself $3 on Ko-fi with the code in the message
 - [ ] Confirm the pass appears in Settings and voice minutes land on the account
+- [ ] Confirm the "Thank you — voice is open" receipt arrives
 - [ ] Send the same webhook twice (Ko-fi's "test" button) and confirm no double grant
 - [ ] `/admin` loads for `ADMIN_EMAIL` and for nobody else
 - [ ] Submit the sitemap in Google Search Console and Bing Webmaster Tools
 
 ---
 
-## 5. Two decisions still open
+## 6. Two decisions still open
 
 **Ko-fi's terms.** Ko-fi's creator-terms template says donations "are not
 payments for goods or services and do not entitle the donor to any tangible or
 intangible benefits beyond personal satisfaction." Unlocking a feature in
-exchange for a plain tip sits badly against that. The fix inside Ko-fi is to
-sell a **Shop item, Pay What You Want, minimum $3, digital** rather than take a
-tip — the webhook already handles Shop orders, since it reads `amount` and
-`message` the same way. Also check Ko-fi's "Contributor" setting, which is
+exchange for a plain tip sits badly against that — and note that presenting no
+price ladder in the UI, which is what we do, helps the framing but does not by
+itself resolve it, because a benefit is still delivered. The fix inside Ko-fi
+is to sell a **Shop item, Pay What You Want, minimum $3, digital** rather than
+take a tip; that is still a single open "pay what you want" ask to the member,
+so nothing about the popup changes. The webhook already handles Shop orders,
+since it reads `amount` and `message` the same way. Also check Ko-fi's "Contributor" setting, which is
 reported to default ON for new creators and takes an extra 5% of tips.
 
 **Stripe would be better for this.** Payment Links cost 2.9% + $0.30 with no

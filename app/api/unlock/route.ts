@@ -4,7 +4,7 @@ import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 import { getUserById } from "@/lib/users";
 import { accessForUser } from "@/lib/access";
 import { hasGivenFeedback } from "@/lib/feedback";
-import { currentUnlockCode, kofiUrl, MIN_SUPPORT_USD, SUPPORT_TIERS, activePass } from "@/lib/support";
+import { currentUnlockCode, kofiUrl, MIN_SUPPORT_USD, activePass } from "@/lib/support";
 import { getVoiceQuotaSnapshot } from "@/lib/voice-quota";
 
 export const runtime = "nodejs";
@@ -18,6 +18,11 @@ export const dynamic = "force-dynamic";
  *
  * The unlock code is only issued once gate one is done, so the member is never
  * handed a payment code before they have been asked how it went.
+ *
+ * The tier ladder is deliberately not in this response. Supporting the creator
+ * is not a plan being sold and is never presented as one — the member gives
+ * what they want to give, and the ladder is only how the server decides what
+ * voice package to deliver for what arrived.
  */
 export async function GET() {
   const claims = await verifySession(cookies().get(SESSION_COOKIE)?.value);
@@ -38,14 +43,6 @@ export async function GET() {
     code: reviewed ? await currentUnlockCode(user.id) : null,
     kofiUrl: kofiUrl(),
     minUsd: MIN_SUPPORT_USD,
-    tiers: SUPPORT_TIERS.map((t) => ({
-      key: t.key,
-      label: t.label,
-      suggestUsd: t.suggestUsd,
-      voiceMinutes: t.voiceMinutes,
-      months: t.months,
-      blurb: t.blurb,
-    })),
     pass: pass
       ? { tierKey: pass.tierKey, expiresAt: pass.expiresAt, voiceMinutesGranted: pass.voiceMinutesGranted }
       : null,

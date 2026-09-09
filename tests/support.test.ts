@@ -306,3 +306,26 @@ test("claiming with neither a transaction id nor an email finds nothing", async 
   const res = await claimPaymentManually("u-nothing", {});
   assert.equal(res.ok, false);
 });
+
+/* ---------------------------------------------------------------- */
+/* The support ask is not a plan                                     */
+/* ---------------------------------------------------------------- */
+
+test("the delivery bands are never sent to the browser", async () => {
+  // Supporting the creator is one open ask, not a price list. If a tier ever
+  // reaches the client, the popup silently becomes a subscription page.
+  const { readFileSync } = await import("node:fs");
+  for (const file of ["app/api/unlock/route.ts", "components/dashboard/UnlockDialog.tsx"]) {
+    const src = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
+    assert.ok(!src.includes("SUPPORT_TIERS"), `${file} must not serve the band table`);
+    assert.ok(!src.includes("suggestUsd"), `${file} must not render band amounts`);
+  }
+});
+
+test("every band still resolves, so any amount delivers something", () => {
+  // The member picks a number, not a band. Whatever they choose above the
+  // minimum has to land somewhere.
+  for (const amount of [3, 4.2, 9.99, 10, 17, 25, 33, 50, 120]) {
+    assert.ok(tierForAmount(amount), `$${amount} must map to a delivery band`);
+  }
+});

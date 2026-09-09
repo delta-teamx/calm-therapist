@@ -17,20 +17,33 @@ import { grantVoiceMinutes } from "./voice-quota";
  */
 
 /* ------------------------------------------------------------------ */
-/* Tiers                                                               */
+/* Delivery bands                                                      */
 /* ------------------------------------------------------------------ */
 
+/**
+ * These are NOT plans and are never shown to a member as a price list.
+ *
+ * Nobody picks one of these. The member is asked one thing — buy the creator
+ * a coffee, anything from the minimum — and gives whatever they want to give.
+ * These bands are only how the server decides, after the money has arrived,
+ * how much voice we can afford to deliver for it. Keep them out of the API
+ * responses and out of the UI: the moment a member sees a ladder, an open
+ * invitation to support the work turns into a subscription page, which is
+ * exactly what this product is not.
+ */
 export interface SupportTier {
+  /** Internal band name. Stored on the pass so support can reason about it. */
   key: string;
   label: string;
-  /** Lowest amount in USD that lands in this tier. */
+  /** Lowest amount in USD that lands in this band. */
   minUsd: number;
-  /** What we suggest on the button. */
+  /** Reference amount for internal maths only. Never rendered. */
   suggestUsd: number;
   /** Voice minutes added to the member's balance. Minutes are owned, not rented. */
   voiceMinutes: number;
   /** How long circles stay open, and how long the minutes remain spendable. */
   months: number;
+  /** Internal note describing the band. Not user-facing copy. */
   blurb: string;
 }
 
@@ -452,13 +465,42 @@ async function attachPayment(input: {
     if (!row || row.userId) return null;
     row.userId = input.userId;
   }
-  return grantPass({
+  const pass = await grantPass({
     userId: input.userId,
     amountUsd: input.amountUsd,
     currency: input.currency,
     source: "kofi",
     kofiPaymentId: input.paymentId,
   });
+  if (pass) await sendSupportReceipt(input.userId, pass);
+  return pass;
+}
+
+/**
+ * The receipt for a pass. Best effort on purpose: money has already changed
+ * hands and the minutes are already on the account, so a mail provider having
+ * a bad afternoon must not turn into a failed webhook that Ko-fi then retries.
+ */
+async function sendSupportReceipt(userId: string, pass: Pass): Promise<void> {
+  try {
+    const { getUserById } = await import("./users");
+    const { scheduleEmail } = await import("./email-queue");
+    const user = await getUserById(userId);
+    if (!user) return;
+    await scheduleEmail({
+      userId: user.id,
+      to: user.email,
+      templateKey: "support-thanks",
+      ctx: {
+        name: user.name,
+        email: user.email,
+        appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "",
+        voiceMinutesGranted: pass.voiceMinutesGranted,
+      },
+    });
+  } catch (err) {
+    console.error("[support] receipt not queued", (err as Error).message);
+  }
 }
 
 /**

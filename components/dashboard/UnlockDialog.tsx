@@ -14,22 +14,12 @@ import { useCallback, useEffect, useState } from "react";
  * "I already paid" panel matches it by transaction id or email instead.
  */
 
-export interface UnlockTier {
-  key: string;
-  label: string;
-  suggestUsd: number;
-  voiceMinutes: number;
-  months: number;
-  blurb: string;
-}
-
 export interface UnlockState {
   unlocked: boolean;
   gates: { reviewed: boolean; supported: boolean };
   code: string | null;
   kofiUrl: string | null;
   minUsd: number;
-  tiers: UnlockTier[];
   pass: { tierKey: string; expiresAt: string; voiceMinutesGranted: number } | null;
   voice: { balanceSec: number; remainingSec: number };
 }
@@ -363,30 +353,10 @@ function SupportStep({ state, onDone }: { state: UnlockState; onDone: () => Prom
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <p style={{ fontSize: 14, color: "var(--calm-ink-70)", margin: 0 }}>
-        Anything from ${state.minUsd}. What you give decides how many voice minutes land on your
-        account and how long circles stay open. Minutes are yours to keep — they do not reset.
+        Buy the creator a coffee — anything from ${state.minUsd}, whatever this has been worth to
+        you. There is no plan to pick and nothing to cancel. The more you can give, the more voice
+        we can afford to put on your account, and those minutes are then yours to keep.
       </p>
-
-      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
-        {state.tiers.map((t) => (
-          <li
-            key={t.key}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 12,
-              padding: "10px 14px",
-              borderRadius: 10,
-              background: "var(--calm-white)",
-              border: "1px solid var(--calm-ink-10)",
-              fontSize: 14,
-            }}
-          >
-            <span style={{ fontWeight: 500 }}>${t.suggestUsd}</span>
-            <span style={{ color: "var(--calm-ink-70)", textAlign: "right" }}>{t.blurb}</span>
-          </li>
-        ))}
-      </ul>
 
       {state.code && (
         <div

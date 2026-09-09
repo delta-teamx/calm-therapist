@@ -12,6 +12,8 @@ export type EmailKey =
   | "inactive-7d"
   | "inactive-30d"
   | "crisis-followup-24h"
+  | "weekly-reflection"
+  | "support-thanks"
   | "topup-receipt"
   | "annual-anniversary"
   | "verify-email"
@@ -32,6 +34,10 @@ export interface TemplateCtx {
   reflection?: string;
   /** Top-up specifics if applicable. */
   topupAmountUsd?: number;
+  /** How many conversations the member had in the week being summarised. */
+  weekSessions?: number;
+  /** Voice minutes a support pass just added to the account. */
+  voiceMinutesGranted?: number;
   /** Verify or reset link path with token already appended. */
   actionUrl?: string;
   /** One-click unsubscribe link, set by the queue for marketing-class mail. */
@@ -39,7 +45,7 @@ export interface TemplateCtx {
 }
 
 /** Templates that must always be sent regardless of email preferences. */
-const TRANSACTIONAL: ReadonlySet<EmailKey> = new Set<EmailKey>(["verify-email", "password-reset", "topup-receipt"]);
+const TRANSACTIONAL: ReadonlySet<EmailKey> = new Set<EmailKey>(["verify-email", "password-reset", "topup-receipt", "support-thanks"]);
 export function isTransactional(key: EmailKey): boolean {
   return TRANSACTIONAL.has(key);
 }
@@ -275,6 +281,76 @@ ${appUrl}/dashboard
          <p style="font-size:14px;color:#5C5C5C;margin:18px 0 0;">— Aura</p>`
       ),
     }),
+  },
+
+  /**
+   * The weekly engagement mail. Deliberately carries nothing personal: no
+   * quotes, no themes, no mood numbers. The count of conversations is the
+   * most it says, and the look-back itself lives behind the login. A mail
+   * that lands in a shared inbox must never disclose what someone talked
+   * about.
+   */
+  "weekly-reflection": {
+    key: "weekly-reflection",
+    delayMinutes: 0,
+    build: ({ name, appUrl, weekSessions }) => {
+      const line =
+        weekSessions && weekSessions > 0
+          ? `You came by ${weekSessions === 1 ? "once" : `${weekSessions} times`} this week. Your look-back is ready when you are.`
+          : "Your space is still here, and so is everything Aura remembers.";
+      return {
+        subject: "Your week, when you want it.",
+        text: `${name},
+
+${line}
+
+${appUrl}/dashboard/reflect
+
+— Aura`,
+        html: wrap(
+          "Your week, when you want it.",
+          `<p style="font-size:16px;line-height:1.7;margin:0 0 12px;">${name},</p>
+           <p style="font-size:16px;line-height:1.7;margin:0 0 12px;">${line}</p>
+           <p style="margin:24px 0;"><a href="${appUrl}/dashboard/reflect" style="display:inline-block;background:#4A7A6D;color:#FFFFFF;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:500;">Open your week</a></p>
+           <p style="font-size:14px;color:#5C5C5C;margin:18px 0 0;">— Aura</p>`
+        ),
+      };
+    },
+  },
+
+  /**
+   * Sent when a support pass lands. It is a receipt, so it goes out whatever
+   * the member's marketing preference is, and it says exactly what arrived on
+   * the account rather than thanking them in the abstract.
+   */
+  "support-thanks": {
+    key: "support-thanks",
+    delayMinutes: 0,
+    build: ({ name, appUrl, voiceMinutesGranted }) => {
+      const got = voiceMinutesGranted && voiceMinutesGranted > 0
+        ? `${voiceMinutesGranted} minutes of voice are on your account now, and your seat in circles is open. The minutes are yours — they do not expire at the end of the month.`
+        : "Voice and circles are open on your account now.";
+      return {
+        subject: "Thank you — voice is open.",
+        text: `${name},
+
+Thank you. That genuinely helps keep this running.
+
+${got}
+
+${appUrl}/dashboard/voice
+
+— Aura`,
+        html: wrap(
+          "Thank you — voice is open.",
+          `<p style="font-size:16px;line-height:1.7;margin:0 0 12px;">${name},</p>
+           <p style="font-size:16px;line-height:1.7;margin:0 0 12px;">Thank you. That genuinely helps keep this running.</p>
+           <p style="font-size:16px;line-height:1.7;margin:0 0 12px;">${got}</p>
+           <p style="margin:24px 0;"><a href="${appUrl}/dashboard/voice" style="display:inline-block;background:#4A7A6D;color:#FFFFFF;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:500;">Talk to Aura</a></p>
+           <p style="font-size:14px;color:#5C5C5C;margin:18px 0 0;">— Aura</p>`
+        ),
+      };
+    },
   },
 
   "topup-receipt": {
