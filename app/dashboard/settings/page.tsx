@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { readState, writeState } from "@/components/onboarding/OnboardingShell";
 import { SupportLink } from "@/components/ui/SupportLink";
+import { UnlockDialog } from "@/components/dashboard/UnlockDialog";
 import type { Access } from "@/lib/access";
 
 interface Me {
@@ -19,6 +20,10 @@ interface Quota {
   monthlyLimitSec: number;
   monthlyUsedSec: number;
   monthlyRemainingSec: number;
+  /** Minutes owned outright from support passes, in seconds. */
+  balanceSec: number;
+  /** What is actually spendable right now. */
+  remainingSec: number;
 }
 
 export default function SettingsPage() {
@@ -122,10 +127,12 @@ export default function SettingsPage() {
               textTransform: "uppercase",
             }}
           >
-            {me.access.tier === "founding"
+            {me.access.tier === "admin"
+              ? "Admin"
+              : me.access.tier === "supporter"
+              ? "Supporter"
+              : me.access.isFoundingMember
               ? `Founding member${me.memberNumber ? ` #${me.memberNumber}` : ""}`
-              : me.access.tier === "pro"
-              ? "Open space"
               : "Member"}
           </span>
         </div>
@@ -196,8 +203,9 @@ export default function SettingsPage() {
 
 function Membership({ me }: { me: Me | null }) {
   const [quota, setQuota] = useState<Quota | null>(null);
+  const [unlockOpen, setUnlockOpen] = useState(false);
 
-  useEffect(() => {
+  const loadQuota = useCallback(() => {
     if (!me?.access.voice) return;
     fetch("/api/voice/quota")
       .then((r) => r.json())
@@ -205,40 +213,55 @@ function Membership({ me }: { me: Me | null }) {
       .catch(() => {});
   }, [me?.access.voice]);
 
+  useEffect(loadQuota, [loadQuota]);
+
   if (!me) return null;
-  const usedMin = quota ? Math.floor(quota.monthlyUsedSec / 60) : 0;
-  const limitMin = quota ? Math.floor(quota.monthlyLimitSec / 60) : me.access.voiceMinutesPerMonth;
-  const pct = limitMin === 0 ? 0 : Math.min(100, (usedMin / limitMin) * 100);
+  const minutesLeft = quota ? Math.floor(quota.remainingSec / 60) : 0;
+  const until = me.access.supportUntil
+    ? new Date(me.access.supportUntil).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
+    : null;
 
   return (
     <Group title="Membership">
       <div className="card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
         <p style={{ fontSize: 16, lineHeight: 1.6, margin: 0 }}>{me.accessLine}</p>
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>
-          <Row ok label="Chat with Aura, unlimited" />
-          <Row ok={me.access.voice} label={me.access.voice ? `Voice sessions, ${me.access.voiceMinutesPerMonth} minutes a month` : "Voice sessions"} />
-          <Row ok={me.access.circles} label="A seat in circles when they open" />
+          <Row ok label="Chat with Aura, unlimited and free" />
+          <Row
+            ok={me.access.voice}
+            label={me.access.voice ? `Voice sessions · ${minutesLeft} minutes left on your account` : "Voice sessions"}
+          />
+          <Row
+            ok={me.access.circles}
+            label={me.access.circles && until ? `A seat in circles, until ${until}` : "A seat in circles"}
+          />
         </ul>
         {me.access.voice && (
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span className="body-micro" style={{ color: "var(--calm-ink-40)" }}>Voice this month</span>
-              <span style={{ fontSize: 13, color: "var(--calm-ink-70)" }}>{usedMin} / {limitMin} min</span>
-            </div>
-            <div style={{ height: 6, background: "var(--calm-ink-10)", borderRadius: 999, overflow: "hidden" }}>
-              <div style={{ width: `${pct}%`, height: "100%", background: "var(--calm-forest)", transition: "width 0.4s ease" }} />
-            </div>
-            <p style={{ marginTop: 6, fontSize: 12, color: "var(--calm-ink-40)" }}>Resets on the 1st. Counted from the call itself, after it ends.</p>
-          </div>
+          <p style={{ fontSize: 12, color: "var(--calm-ink-40)", margin: 0 }}>
+            Minutes are yours outright and never reset. They are counted from the call itself,
+            after it ends.
+          </p>
         )}
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button type="button" className="btn-primary" onClick={() => setUnlockOpen(true)}>
+            {me.access.voice ? "Add more minutes" : "Open voice and circles"}
+          </button>
+        </div>
         {me.access.tier === "member" && (
           <p style={{ fontSize: 14, color: "var(--calm-ink-70)", lineHeight: 1.7, margin: 0 }}>
-            Voice and circles are part of an open space. Prices will appear here when they are ready.
-            Nothing is for sale yet.
+            Chat stays free whatever you decide. Voice and circles open after two small things:
+            telling us honestly how Aura is going, and buying the work a coffee — from $3, once,
+            never a subscription.
           </p>
         )}
       </div>
       <SupportLink variant="card" />
+      <UnlockDialog
+        open={unlockOpen}
+        feature="voice"
+        onClose={() => setUnlockOpen(false)}
+        onUnlocked={loadQuota}
+      />
     </Group>
   );
 }

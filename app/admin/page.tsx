@@ -35,7 +35,7 @@ export default async function AdminOverview() {
 
       <Section title="Founding period and cost">
         <Grid>
-          <StatCard label="Founding seats" value={`${s.founding.seatsTaken} / ${s.founding.cap}`} hint="Free for four months each" />
+          <StatCard label="Founding badges" value={`${s.founding.seatsTaken} / ${s.founding.cap}`} hint="Badge only; grants no access" />
           <StatCard label="Circles gate" value={`${Math.min(s.signups.total, s.founding.circlesOpenAt)} / ${s.founding.circlesOpenAt}`} hint="Circles open at this many members" />
           <StatCard label="API spend, last 30 days" value={`$${s.api.last30d.totalCostUsd.toFixed(2)}`} hint={`${s.api.last30d.llmRequests} model · ${s.api.last30d.voiceRequests} voice`} />
           <StatCard label="API spend, all time" value={`$${s.api.totalCostUsd.toFixed(2)}`} hint="Model + voice estimate" />

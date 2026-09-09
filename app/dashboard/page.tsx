@@ -1,6 +1,7 @@
 "use client";
 
 import { Style } from "@/components/ui/Style";
+import { UnlockDialog } from "@/components/dashboard/UnlockDialog";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -20,6 +21,7 @@ export default function DashboardHome() {
   const [dateLine, setDateLine] = useState("");
   const [accessLine, setAccessLine] = useState<string | null>(null);
   const [members, setMembers] = useState<number | null>(null);
+  const [unlockOpen, setUnlockOpen] = useState(false);
 
   useEffect(() => {
     const s = readState() as Record<string, string>;
@@ -53,7 +55,10 @@ export default function DashboardHome() {
   const hasVoice = access?.voice === true;
 
   const onVoiceClick = () => {
-    router.push(hasVoice ? "/dashboard/voice" : "/dashboard/settings");
+    // No voice yet: open the unlock dialog where they stand rather than
+    // bouncing them into Settings to find it.
+    if (hasVoice) router.push("/dashboard/voice");
+    else setUnlockOpen(true);
   };
 
   return (
@@ -171,8 +176,8 @@ export default function DashboardHome() {
         </Card>
         <Card title="Your space">
           <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--calm-ink-70)" }}>
-            {access?.tier === "founding"
-              ? "Founding member. Everything is open, and your record is yours."
+            {access?.tier === "supporter" || access?.tier === "admin"
+              ? "Voice and circles are open, and your record is yours."
               : "Chat with Aura is always open and always free."}
           </p>
           <Link href="/dashboard/settings" style={{ display: "inline-block", marginTop: 12, fontSize: 14, color: "var(--calm-forest)" }}>
@@ -195,6 +200,13 @@ export default function DashboardHome() {
         <FeedbackPrompt />
       </div>
 
+
+      <UnlockDialog
+        open={unlockOpen}
+        feature="voice"
+        onClose={() => setUnlockOpen(false)}
+        onUnlocked={() => router.push("/dashboard/voice")}
+      />
 
       <Style>{`
         .founding-line { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--calm-forest); background: var(--calm-forest-10); border-radius: 999px; padding: 8px 14px; margin-bottom: 32px; }

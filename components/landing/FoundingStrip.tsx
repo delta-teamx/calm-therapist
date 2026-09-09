@@ -8,14 +8,15 @@ interface Founding {
   members: number;
   cap: number;
   seatsLeft: number;
-  freeMonths: number;
+  minSupportUsd: number;
   circlesOpenAt: number;
 }
 
 /**
- * The one number that matters on the landing page: how many founding seats
- * are left. Reads the public founding endpoint; renders a quiet fallback
- * until it answers.
+ * The landing strip: chat is free for everyone, and how many people are
+ * already here. The founding number is a badge for the first arrivals, not
+ * an access window — nothing on this strip promises free voice or circles.
+ * Reads the public endpoint; renders a quiet fallback until it answers.
  */
 export function FoundingStrip() {
   const [f, setF] = useState<Founding | null>(null);
@@ -34,24 +35,25 @@ export function FoundingStrip() {
     <section style={{ background: "var(--calm-forest)", color: "white", padding: "28px 24px" }}>
       <div className="container founding-strip">
         <div style={{ flex: 1, minWidth: 260 }}>
-          <p className="body-micro" style={{ opacity: 0.8, marginBottom: 6 }}>Founding members</p>
+          <p className="body-micro" style={{ opacity: 0.8, marginBottom: 6 }}>Free to start</p>
           <p style={{ fontFamily: "var(--font-heading)", fontSize: 26, lineHeight: 1.2 }}>
-            The first {cap} get everything free for {f?.freeMonths ?? 4} months.
+            Chat with Aura is free. No card, no trial.
           </p>
           <p style={{ fontSize: 14, opacity: 0.85, marginTop: 6 }}>
-            Chat, voice, and circles. No card, no limits. Chat stays free for everyone after that.
+            The first {cap} members keep a founding badge and their number. Voice and circles open
+            later, from ${f?.minSupportUsd ?? 3}, whenever you want them.
           </p>
         </div>
         <div style={{ minWidth: 220, flex: "0 1 320px" }}>
-          <div className="founding-bar" role="img" aria-label={`${taken} of ${cap} founding seats taken`}>
+          <div className="founding-bar" role="img" aria-label={`${taken} of ${cap} founding badges claimed`}>
             <span style={{ width: `${pct}%` }} />
           </div>
           <p style={{ fontSize: 13, marginTop: 8, opacity: 0.9 }}>
-            {f ? `${taken} of ${cap} seats taken` : `${cap} seats`}
+            {f ? `${taken} of ${cap} founding badges claimed` : `${cap} badges`}
           </p>
         </div>
         <Link href="/auth/signup" className="btn-light" style={{ whiteSpace: "nowrap" }}>
-          Take a seat
+          Start free
         </Link>
       </div>
       <Style>{`

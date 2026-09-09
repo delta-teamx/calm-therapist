@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 import { getUserById } from "@/lib/users";
-import { accessFor } from "@/lib/access";
+import { accessForUser } from "@/lib/access";
 import { closeVoiceSession, getVoiceQuotaSnapshot } from "@/lib/voice-quota";
 import { agentId, getConversation } from "@/lib/elevenlabs";
 import { recordVoiceSession, type Turn } from "@/lib/sessions";
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
   }
 
   const recorded = await closeVoiceSession({ sessionId, userId: user.id, conversationId, durationSec });
-  const access = accessFor(user);
+  const access = await accessForUser(user);
   const snap = await getVoiceQuotaSnapshot(user.id, access);
   return NextResponse.json({ ok: recorded, durationSec, quota: { plan: user.plan, access, ...snap } });
 }

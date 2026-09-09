@@ -85,6 +85,19 @@ export async function recentlyGaveFeedback(userId: string): Promise<boolean> {
   return memoryStore.some((f) => f.userId === userId && new Date(f.createdAt) >= since);
 }
 
+/**
+ * Has this member ever told us how it went? This is the first of the two
+ * gates on voice and circles. Any rating counts — including a low one.
+ * Nothing here reads the rating, and nothing asks for it to be public.
+ */
+export async function hasGivenFeedback(userId: string): Promise<boolean> {
+  if (dbEnabled) {
+    const n = await prisma.feedback.count({ where: { userId } });
+    return n > 0;
+  }
+  return memoryStore.some((f) => f.userId === userId);
+}
+
 export async function listFeedback(filter?: {
   category?: FeedbackCategory;
   status?: FeedbackStatus;

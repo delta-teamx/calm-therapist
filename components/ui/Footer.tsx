@@ -11,7 +11,7 @@ const productLinks = [
   { href: "/circles", label: "Circles" },
   { href: "/features/crisis", label: "Crisis safety" },
   { href: "/features", label: "All features" },
-  { href: "/#pricing", label: "Founding members" },
+  { href: "/#pricing", label: "What it costs" },
 ];
 
 const learnLinks = [

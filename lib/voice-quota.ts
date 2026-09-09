@@ -22,6 +22,8 @@ export interface VoiceQuotaState {
   weeklyBonusSec: number;
   monthlyBonusSec: number;
   topupsThisMonth: number;
+  /** Minutes owned outright from a support pass. Survives month rollover. */
+  balanceSec: number;
 }
 
 const globalAny = globalThis as unknown as { __calmVoiceQuota?: Map<string, VoiceQuotaState> };
@@ -70,6 +72,7 @@ function fresh(userId: string, now: Date): VoiceQuotaState {
     weeklyBonusSec: 0,
     monthlyBonusSec: 0,
     topupsThisMonth: 0,
+    balanceSec: 0,
   };
 }
 
@@ -93,6 +96,7 @@ async function ensure(userId: string): Promise<VoiceQuotaState> {
       weeklyBonusSec: row.weeklyBonusSec,
       monthlyBonusSec: row.monthlyBonusSec,
       topupsThisMonth: row.topupsThisMonth,
+      balanceSec: row.balanceSec,
     };
     const rolled = rolledOver(cur, now);
     if (rolled !== cur) {
@@ -129,43 +133,83 @@ export interface VoiceQuotaSnapshot {
   monthlyRemainingSec: number;
   monthlyBonusSec: number;
   topupsThisMonth: number;
+  /** Minutes owned from support, in seconds. */
+  balanceSec: number;
+  /** Monthly allowance left plus the owned balance. What the member can actually spend. */
+  remainingSec: number;
   canStart: boolean;
-  /** Kept for older clients; equal to the monthly figures. */
+  /** Kept for older clients; equal to the spendable figures. */
   weeklyLimitSec: number;
   weeklyUsedSec: number;
   weeklyRemainingSec: number;
 }
 
+/** Under this, a call is not worth starting: it would end almost immediately. */
+export const MIN_START_SEC = 60;
+
 export async function getVoiceQuotaSnapshot(userId: string, access: Access): Promise<VoiceQuotaSnapshot> {
   const s = await ensure(userId);
   const monthlyLimit = access.voice ? access.voiceMinutesPerMonth * 60 + s.monthlyBonusSec : 0;
   const monthlyRemaining = Math.max(0, monthlyLimit - s.monthlyUsedSec);
+  const remaining = monthlyRemaining + s.balanceSec;
   return {
     monthlyLimitSec: monthlyLimit,
     monthlyUsedSec: s.monthlyUsedSec,
     monthlyRemainingSec: monthlyRemaining,
     monthlyBonusSec: s.monthlyBonusSec,
     topupsThisMonth: s.topupsThisMonth,
-    canStart: access.voice && monthlyRemaining > 30,
+    balanceSec: s.balanceSec,
+    remainingSec: remaining,
+    canStart: access.voice && remaining >= MIN_START_SEC,
     weeklyLimitSec: monthlyLimit,
     weeklyUsedSec: s.monthlyUsedSec,
-    weeklyRemainingSec: monthlyRemaining,
+    weeklyRemainingSec: remaining,
   };
 }
 
-/** Atomic add of used seconds. */
-export async function recordVoiceSeconds(userId: string, seconds: number): Promise<void> {
-  const sec = Math.round(seconds);
+/** Adds owned minutes. Called when a support pass is granted. */
+export async function grantVoiceMinutes(userId: string, minutes: number): Promise<void> {
+  const sec = Math.round(minutes * 60);
   if (!Number.isFinite(sec) || sec <= 0) return;
   const s = await ensure(userId);
   if (dbEnabled) {
+    await prisma.voiceQuota.update({ where: { userId }, data: { balanceSec: { increment: sec } } });
+    return;
+  }
+  memoryStore.set(userId, { ...s, balanceSec: s.balanceSec + sec });
+}
+
+/**
+ * Records seconds used. A monthly allowance is spent first (admins and any
+ * legacy top-up), then the minutes the member owns from supporting. The
+ * balance never goes below zero, so an overrun is absorbed rather than
+ * leaving a debt.
+ */
+export async function recordVoiceSeconds(userId: string, seconds: number, monthlyAllowanceSec = 0): Promise<void> {
+  const sec = Math.round(seconds);
+  if (!Number.isFinite(sec) || sec <= 0) return;
+  const s = await ensure(userId);
+  const allowanceLeft = Math.max(0, monthlyAllowanceSec + s.monthlyBonusSec - s.monthlyUsedSec);
+  const fromAllowance = Math.min(sec, allowanceLeft);
+  const fromBalance = Math.min(s.balanceSec, sec - fromAllowance);
+
+  if (dbEnabled) {
     await prisma.voiceQuota.update({
       where: { userId },
-      data: { weeklyUsedSec: { increment: sec }, monthlyUsedSec: { increment: sec } },
+      data: {
+        weeklyUsedSec: { increment: sec },
+        monthlyUsedSec: { increment: sec },
+        ...(fromBalance > 0 ? { balanceSec: { decrement: fromBalance } } : {}),
+      },
     });
     return;
   }
-  memoryStore.set(userId, { ...s, weeklyUsedSec: s.weeklyUsedSec + sec, monthlyUsedSec: s.monthlyUsedSec + sec });
+  memoryStore.set(userId, {
+    ...s,
+    weeklyUsedSec: s.weeklyUsedSec + sec,
+    monthlyUsedSec: s.monthlyUsedSec + sec,
+    balanceSec: Math.max(0, s.balanceSec - fromBalance),
+  });
 }
 
 export async function recordVoiceMinutes(userId: string, minutes: number): Promise<void> {
@@ -241,6 +285,8 @@ export async function closeVoiceSession(input: {
   userId: string;
   conversationId: string;
   durationSec: number;
+  /** The member's monthly allowance in seconds, spent before owned minutes. */
+  monthlyAllowanceSec?: number;
 }): Promise<boolean> {
   if (dbEnabled) {
     const row = await prisma.voiceSession.findUnique({ where: { id: input.sessionId } });
@@ -251,13 +297,13 @@ export async function closeVoiceSession(input: {
       where: { id: input.sessionId },
       data: { conversationId: input.conversationId, durationSec: input.durationSec, endedAt: new Date() },
     });
-    await recordVoiceSeconds(input.userId, input.durationSec);
+    await recordVoiceSeconds(input.userId, input.durationSec, input.monthlyAllowanceSec ?? 0);
     return true;
   }
   const s = sessionStore.get(input.sessionId);
   if (!s || s.userId !== input.userId || s.conversationId) return false;
   for (const other of sessionStore.values()) if (other.conversationId === input.conversationId) return false;
   sessionStore.set(input.sessionId, { ...s, conversationId: input.conversationId, durationSec: input.durationSec });
-  await recordVoiceSeconds(input.userId, input.durationSec);
+  await recordVoiceSeconds(input.userId, input.durationSec, input.monthlyAllowanceSec ?? 0);
   return true;
 }

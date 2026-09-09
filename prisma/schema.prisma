@@ -10,20 +10,20 @@ datasource db {
 }
 
 model User {
-  id                 String         @id @default(cuid())
-  email              String         @unique
+  id                 String    @id @default(cuid())
+  email              String    @unique
   name               String
   passwordHash       String
   ageGroup           String?
-  tone               String         @default("warm")
+  tone               String    @default("warm")
   focusAreas         String[]
-  language           String         @default("en")
-  plan               String         @default("free") // "free" | "pro"
-  stripeCustomerId   String?        @unique
-  isAdmin            Boolean        @default(false)
+  language           String    @default("en")
+  plan               String    @default("free") // "free" | "pro"
+  stripeCustomerId   String?   @unique
+  isAdmin            Boolean   @default(false)
   // Founding access: member number assigned at signup; the first 150 get full
   // access for four months from foundingUntil computation (see lib/access.ts).
-  memberNumber       Int?           @unique
+  memberNumber       Int?      @unique
   // First-touch attribution captured at signup (landing path, external referrer).
   signupLanding      String?
   signupReferrer     String?
@@ -32,13 +32,13 @@ model User {
   crisisContactName  String?
   crisisContactPhone String?
   // Email preferences
-  emailOptOut        Boolean        @default(false)
-  unsubscribeToken   String?        @unique
+  emailOptOut        Boolean   @default(false)
+  unsubscribeToken   String?   @unique
   // Safety: last crisis tier and when it was set (sticky for a window).
-  crisisTier         Int            @default(0)
+  crisisTier         Int       @default(0)
   crisisTierAt       DateTime?
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   // Cultural profile
   culturalContext    String?
@@ -50,24 +50,26 @@ model User {
 
   // Email verification + password reset (single-use tokens, expiring).
   emailVerified      DateTime?
-  verifyToken        String?        @unique
+  verifyToken        String?   @unique
   verifyTokenExpires DateTime?
-  resetToken         String?        @unique
+  resetToken         String?   @unique
   resetTokenExpires  DateTime?
 
-  sessions       Session[]
-  memories       Memory[]
-  goals          Goal[]
-  journalEntries JournalEntry[]
-  subscription   Subscription?
-  feedback       Feedback[]
-  emailQueue     EmailQueueRow[]
-  usageEvents    UsageEvent[]
-  voiceQuota     VoiceQuota?
-  crisisEvents   CrisisEvent[]
+  sessions        Session[]
+  memories        Memory[]
+  goals           Goal[]
+  journalEntries  JournalEntry[]
+  subscription    Subscription?
+  feedback        Feedback[]
+  emailQueue      EmailQueueRow[]
+  usageEvents     UsageEvent[]
+  voiceQuota      VoiceQuota?
+  crisisEvents    CrisisEvent[]
   circleInterests CircleInterest[]
-  moodEntries    MoodEntry[]
-  voiceSessions  VoiceSession[]
+  moodEntries     MoodEntry[]
+  supportPasses   SupportPass[]
+  unlockCodes     UnlockCode[]
+  voiceSessions   VoiceSession[]
 
   @@index([createdAt])
   @@index([plan])
@@ -231,25 +233,27 @@ model VoiceQuota {
   weeklyBonusSec  Int      @default(0)
   monthlyBonusSec Int      @default(0)
   topupsThisMonth Int      @default(0)
+  /// Minutes owned outright, granted by a support pass. Never reset by rollover.
+  balanceSec      Int      @default(0)
   updatedAt       DateTime @updatedAt
 }
 
 model UsageEvent {
-  id                String   @id @default(cuid())
-  service           String
-  userId            String?
-  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  tokensIn          Int?
-  tokensOut         Int?
-  durationMs        Int?
-  estimatedCostUsd  Float?
-  stance            String?
-  ruleViolations    String?
+  id               String   @id @default(cuid())
+  service          String
+  userId           String?
+  user             User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tokensIn         Int?
+  tokensOut        Int?
+  durationMs       Int?
+  estimatedCostUsd Float?
+  stance           String?
+  ruleViolations   String?
   // Links the turn to its conversation, and keeps enough to recompute cost.
-  sessionId         String?
-  model             String?
-  cacheReadTokens   Int?
-  at                DateTime @default(now())
+  sessionId        String?
+  model            String?
+  cacheReadTokens  Int?
+  at               DateTime @default(now())
 
   @@index([at])
   @@index([userId, at])
@@ -257,13 +261,13 @@ model UsageEvent {
 }
 
 model EmailQueueRow {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  to          String
-  templateKey String
-  ctxJson     Json
-  scheduledAt DateTime
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  to            String
+  templateKey   String
+  ctxJson       Json
+  scheduledAt   DateTime
   status        String    @default("pending") // "pending" | "sending" | "sent" | "failed" | "cancelled"
   sentAt        DateTime?
   error         String?
@@ -302,4 +306,65 @@ model MoodEntry {
 
   @@unique([userId, day])
   @@index([userId, day])
+}
+
+/// A payment received from Ko-fi. Every webhook is stored exactly once,
+/// keyed by Ko-fi's own message id, so a retry is a no-op and an unmatched
+/// payment is never lost. `userId` is set when the payment is matched to an
+/// account, either by unlock code, by email, or by hand in admin.
+model KofiPayment {
+  id             String    @id
+  transactionId  String?   @unique
+  type           String
+  amountUsd      Float
+  currency       String
+  fromName       String?
+  email          String?
+  message        String?
+  claimCode      String?
+  isSubscription Boolean   @default(false)
+  raw            Json
+  receivedAt     DateTime  @default(now())
+  userId         String?
+  matchedAt      DateTime?
+  matchedBy      String?
+
+  @@index([userId])
+  @@index([claimCode])
+  @@index([email])
+  @@index([receivedAt])
+}
+
+/// What a supporter unlocked, and until when. Voice minutes are a monthly
+/// allowance that resets with the voice quota; circles is a flag.
+model SupportPass {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tierKey              String
+  amountUsd            Float
+  currency             String   @default("USD")
+  voiceMinutesPerMonth Int
+  circles              Boolean  @default(true)
+  source               String   @default("kofi")
+  kofiPaymentId        String?  @unique
+  startedAt            DateTime @default(now())
+  expiresAt            DateTime
+  note                 String?
+
+  @@index([userId, expiresAt])
+}
+
+/// A short code the member puts in their Ko-fi message so the payment can be
+/// matched back to their account. Single use, short lived.
+model UnlockCode {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code       String    @unique
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+  consumedAt DateTime?
+
+  @@index([userId, createdAt])
 }

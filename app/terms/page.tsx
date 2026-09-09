@@ -59,17 +59,31 @@ export default function TermsPage() {
             </ul>
           </Section>
 
-          <Section title="Free access and support">
+          <Section title="Free access, and what a support pass buys">
             <p>
-              Chat with Aura is free. The first founding members also receive voice and circles at no
-              charge for a fixed period from their sign-up date, shown in{" "}
-              <Link href="/dashboard/settings" style={{ color: "var(--calm-forest)" }}>Settings</Link>.
-              When paid options are introduced they will be shown inside the app before anything is
-              charged, and nothing renews without your explicit agreement.
+              Chat with Aura is free for everyone, with no trial period and no card. We do not
+              intend to put chat behind a payment, and if that ever changed you would be told
+              inside the app before it happened.
             </p>
             <p>
-              Contributions made through the &ldquo;support the creator&rdquo; link are voluntary gifts
-              processed by a third party. They do not unlock features and are not refundable by us.
+              Voice and circles are metered services that cost us money per minute, so they open on
+              a <strong>support pass</strong>: a one-off payment from $3, processed by Ko-fi. What
+              you pay determines how many voice minutes are added to your account and how long your
+              circles seat stays open; both are shown in{" "}
+              <Link href="/dashboard/settings" style={{ color: "var(--calm-forest)" }}>Settings</Link>.
+              Voice minutes are yours outright and do not expire at the end of a month. A support
+              pass is a one-time purchase — nothing renews, and we never store your card.
+            </p>
+            <p>
+              We also ask you to tell us how Aura has been before a pass is issued. Any rating opens
+              the gate, including a low one; your words stay private between you and us unless you
+              separately tick the box allowing us to quote you. We never require a review to be
+              public or positive in exchange for access.
+            </p>
+            <p>
+              Unused voice minutes and unexpired circle access are refundable within 14 days if you
+              ask us at the contact address below. Minutes you have already spent are not, since
+              they have been paid onward to the voice provider.
             </p>
           </Section>
 

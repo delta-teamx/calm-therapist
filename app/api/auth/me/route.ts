@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 import { getUserById } from "@/lib/users";
-import { accessFor, describeAccess } from "@/lib/access";
+import { accessForUser, describeAccess } from "@/lib/access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ export async function GET() {
   if (!claims) return NextResponse.json({ user: null }, { status: 200 });
   const user = await getUserById(claims.sub);
   if (!user) return NextResponse.json({ user: null }, { status: 200 });
-  const access = accessFor(user);
+  const access = await accessForUser(user);
   return NextResponse.json({
     user: {
       email: user.email,

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { VoiceAgent } from "@/components/agents/VoiceAgent";
+import { UnlockDialog } from "@/components/dashboard/UnlockDialog";
 import { ModeBar } from "@/components/agents/ModeBar";
 import { useServerProfile } from "@/components/dashboard/useServerProfile";
 import type { AgentModeKey, UserProfile } from "@/lib/aura";
@@ -15,6 +16,8 @@ interface QuotaSnapshot {
   monthlyLimitSec: number;
   monthlyUsedSec: number;
   monthlyRemainingSec: number;
+  balanceSec: number;
+  remainingSec: number;
   canStart: boolean;
 }
 
@@ -23,6 +26,7 @@ export default function VoicePage() {
   const [activeMode, setActiveMode] = useState<AgentModeKey | null>(null);
   const [quota, setQuota] = useState<QuotaSnapshot | null>(null);
   const [dateLine, setDateLine] = useState("");
+  const [unlockOpen, setUnlockOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -71,9 +75,9 @@ export default function VoicePage() {
         {hasVoice && <ModeBar active={activeMode} onChange={persistMode} />}
       </header>
 
-      {quota && !hasVoice && <NoVoice />}
+      {quota && !hasVoice && <NoVoice onOpen={() => setUnlockOpen(true)} />}
 
-      {outOfMinutes && quota && <OutOfMinutes limitMin={Math.floor(quota.monthlyLimitSec / 60)} />}
+      {outOfMinutes && quota && <OutOfMinutes onOpen={() => setUnlockOpen(true)} />}
 
       {hasVoice && !outOfMinutes && quota && (
         <VoiceAgent profile={profileWithMode} onSessionRecorded={refreshQuota} />
@@ -81,10 +85,17 @@ export default function VoicePage() {
 
       {hasVoice && quota && (
         <p style={{ textAlign: "center", fontSize: 12, color: "var(--calm-ink-40)", padding: "0 24px 24px" }}>
-          {Math.floor(quota.monthlyUsedSec / 60)} of {Math.floor(quota.monthlyLimitSec / 60)} voice minutes used this month.
-          Minutes are counted from the call itself, after it ends.
+          {Math.floor(quota.remainingSec / 60)} voice minutes left on your account. They are yours and
+          do not expire; minutes are counted from the call itself, after it ends.
         </p>
       )}
+
+      <UnlockDialog
+        open={unlockOpen}
+        feature="voice"
+        onClose={() => setUnlockOpen(false)}
+        onUnlocked={() => void refreshQuota()}
+      />
 
       <Style>{`
         .voice-page { padding: 0; height: 100%; display: flex; flex-direction: column; }
@@ -97,7 +108,7 @@ export default function VoicePage() {
   );
 }
 
-function NoVoice() {
+function NoVoice({ onOpen }: { onOpen: () => void }) {
   return (
     <div
       style={{
@@ -113,21 +124,22 @@ function NoVoice() {
         maxWidth: 720,
       }}
     >
-      <p className="body-micro" style={{ color: "var(--calm-forest)" }}>Voice is part of an open space</p>
-      <h3>Chat is always open. Voice comes with an open space.</h3>
+      <p className="body-micro" style={{ color: "var(--calm-forest)" }}>Two small things open voice</p>
+      <h3>Chat is always free. Talking out loud opens with your support.</h3>
       <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--calm-ink-70)" }}>
-        Voice costs more to run than text, so it sits with the paid space once early access ends.
-        Your chat with Aura stays free. You can see what is included in Settings.
+        Every voice minute costs us real money at the provider, so voice opens once you have told
+        us how Aura is going and helped cover the bill. From $3. The minutes are then yours to
+        keep — they do not reset at the end of a month.
       </p>
       <div style={{ display: "flex", gap: 12, marginTop: 12, flexWrap: "wrap" }}>
-        <Link href="/dashboard/settings" className="btn-primary">See membership</Link>
+        <button type="button" className="btn-primary" onClick={onOpen}>Open voice</button>
         <Link href="/dashboard/session" className="btn-ghost">Talk by text</Link>
       </div>
     </div>
   );
 }
 
-function OutOfMinutes({ limitMin }: { limitMin: number }) {
+function OutOfMinutes({ onOpen }: { onOpen: () => void }) {
   return (
     <div
       style={{
@@ -142,14 +154,15 @@ function OutOfMinutes({ limitMin }: { limitMin: number }) {
         maxWidth: 720,
       }}
     >
-      <p className="body-micro" style={{ color: "var(--calm-forest)" }}>You have used your voice minutes for this month</p>
-      <h3>We have talked a lot. Let us rest the voice for a bit.</h3>
+      <p className="body-micro" style={{ color: "var(--calm-forest)" }}>Your voice minutes are spent</p>
+      <h3>We have talked a lot. Text is open and waiting.</h3>
       <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--calm-ink-70)" }}>
-        Voice has a fair-use limit of {limitMin} minutes a month during early access and resets on the 1st.
-        Text is open and waiting.
+        Chat with Aura carries on free, with everything she remembers. When you want more voice,
+        another coffee adds more minutes to your account.
       </p>
       <div style={{ display: "flex", gap: 12, marginTop: 12, flexWrap: "wrap" }}>
         <Link href="/dashboard/session" className="btn-primary">Switch to text</Link>
+        <button type="button" className="btn-ghost" onClick={onOpen}>Add minutes</button>
       </div>
     </div>
   );

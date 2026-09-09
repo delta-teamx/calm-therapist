@@ -1,7 +1,11 @@
 /**
- * "Support the creator" line. Ko-fi is a tip link, nothing more: it unlocks
- * nothing and is never described as a purchase. Renders nothing when
- * NEXT_PUBLIC_KOFI_URL is unset.
+ * "Support the creator" line.
+ *
+ * Supporting on Ko-fi is what opens voice and circles, so this says that
+ * plainly rather than describing itself as a pure tip. The actual unlock
+ * happens in the dashboard dialog, which knows the account; this is only
+ * the public-facing invitation. Renders nothing when NEXT_PUBLIC_KOFI_URL
+ * is unset.
  */
 export function SupportLink({
   variant = "inline",
@@ -16,9 +20,9 @@ export function SupportLink({
   if (variant === "footer") {
     return (
       <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, ...style }}>
-        Calm Therapist is free while we build it. If it has helped you,{" "}
+        Chat with Aura is free, always. Voice and circles open when you{" "}
         <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "underline" }}>
-          you can buy the creator a coffee
+          support the work
         </a>
         .
       </p>
@@ -39,13 +43,14 @@ export function SupportLink({
           ...style,
         }}
       >
-        <p className="body-micro" style={{ color: "var(--calm-forest)" }}>Free while we build it</p>
+        <p className="body-micro" style={{ color: "var(--calm-forest)" }}>Chat is free, always</p>
         <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--calm-ink-70)", margin: 0 }}>
-          Nothing here is for sale right now. If Aura has helped you and you want to support the
-          person building her, you can buy them a coffee. It changes nothing about your account.
+          Voice and circles run on metered providers, so they open on a one-off support pass from
+          $3. Sign in first — the unlock happens inside your dashboard, where we can put the
+          minutes on your account.
         </p>
         <a href={url} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ alignSelf: "flex-start" }}>
-          Buy the creator a coffee
+          See the Ko-fi page
         </a>
       </div>
     );
@@ -53,9 +58,9 @@ export function SupportLink({
 
   return (
     <p style={{ fontSize: 13, color: "var(--calm-ink-40)", ...style }}>
-      Free while we build it. If it helped,{" "}
+      Chat is free, always. Voice and circles open from $3 —{" "}
       <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--calm-forest)" }}>
-        buy the creator a coffee
+        support the work
       </a>
       .
     </p>

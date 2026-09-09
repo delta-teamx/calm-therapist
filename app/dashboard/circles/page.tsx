@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Style } from "@/components/ui/Style";
+import { UnlockDialog } from "@/components/dashboard/UnlockDialog";
 import type { Access } from "@/lib/access";
 import { CIRCLE_MINUTES, CIRCLE_RULES, CIRCLE_SEATS, CIRCLE_THEMES } from "@/lib/circle-themes";
 
@@ -14,8 +15,9 @@ export default function CirclesDashboardPage() {
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<"idle" | "done" | "error">("idle");
+  const [unlockOpen, setUnlockOpen] = useState(false);
 
-  useEffect(() => {
+  const load = () => {
     fetch("/api/circles/interest")
       .then((r) => (r.ok ? r.json() : null))
       .then((d: Payload | null) => {
@@ -24,7 +26,9 @@ export default function CirclesDashboardPage() {
         setPicked(new Set(d.themes));
       })
       .catch(() => {});
-  }, []);
+  };
+
+  useEffect(load, []);
 
   const toggle = (slug: string) => {
     setSaved("idle");
@@ -84,9 +88,14 @@ export default function CirclesDashboardPage() {
         </div>
         <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--calm-ink-70)", marginTop: 16 }}>
           {data?.access.circles
-            ? "Your seat is included. When circles open, Aura invites you to the nights that match the themes you pick below."
-            : "Circles are part of an open space. Pick themes anyway; that is how the first nights get planned."}
+            ? "Your seat is held. When circles open, Aura invites you to the nights that match the themes you pick below."
+            : "A seat in a circle opens when you have told us how Aura is going and supported the work, from $3. Pick your themes either way; that is how the first nights get planned."}
         </p>
+        {data && !data.access.circles && (
+          <button type="button" className="btn-primary" style={{ marginTop: 16 }} onClick={() => setUnlockOpen(true)}>
+            Open my seat
+          </button>
+        )}
       </section>
 
       <section className="card" style={{ marginBottom: 24 }}>
@@ -146,6 +155,13 @@ export default function CirclesDashboardPage() {
       <p style={{ marginTop: 24, fontSize: 14, color: "var(--calm-ink-40)" }}>
         Until circles open, the private room is always here. <Link href="/dashboard/session" style={{ color: "var(--calm-forest)" }}>Talk to Aura →</Link>
       </p>
+
+      <UnlockDialog
+        open={unlockOpen}
+        feature="circles"
+        onClose={() => setUnlockOpen(false)}
+        onUnlocked={load}
+      />
 
       <Style>{`
         .circle-bar { height: 10px; background: var(--calm-forest-10); border-radius: 999px; overflow: hidden; margin-top: 14px; }

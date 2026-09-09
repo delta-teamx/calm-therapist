@@ -1,23 +1,27 @@
 import { Style } from "@/components/ui/Style";
 import Link from "next/link";
 
-const FOUNDING_CAP = process.env.NEXT_PUBLIC_FOUNDING_CAP ?? "150";
+const MIN_SUPPORT = process.env.NEXT_PUBLIC_MIN_SUPPORT_USD ?? "3";
 
 /**
- * Early-access pricing: nothing is for sale. The first members get
- * everything free for four months. Paid plans, when they arrive, are shown
- * inside the dashboard only. Chat with Aura stays free for everyone.
+ * What things cost, said plainly.
+ *
+ * Chat with Aura is free for everyone with no card and no trial. Voice and
+ * circles run on metered providers, so they open on a one-off support pass
+ * from $3, which puts minutes on the account that are then owned outright.
+ * There is no subscription and nothing renews on its own.
  */
 export function Pricing() {
   return (
     <section id="pricing" style={{ background: "var(--calm-white)", padding: "120px 24px" }}>
       <div className="container">
         <div style={{ textAlign: "center", maxWidth: 720, margin: "0 auto 48px" }}>
-          <span className="micro-label" style={{ color: "var(--calm-forest)" }}>Early access</span>
-          <h2 style={{ marginTop: 16, marginBottom: 16 }}>Free for the first {FOUNDING_CAP} members.</h2>
+          <span className="micro-label" style={{ color: "var(--calm-forest)" }}>What it costs</span>
+          <h2 style={{ marginTop: 16, marginBottom: 16 }}>Chat is free. Always.</h2>
           <p className="body-large" style={{ color: "var(--calm-ink-70)" }}>
-            We are building this with the people who use it. Join now and everything is open for
-            four months: chat, voice, and circles when they arrive. No card, no limits, no catch.
+            No card, no trial, no timer. Voice and circles cost us real money every minute they
+            run, so they open when you tell us how it is going and buy the work a coffee —
+            from ${MIN_SUPPORT}, once, not a subscription.
           </p>
         </div>
 
@@ -26,37 +30,39 @@ export function Pricing() {
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, maxWidth: 880, margin: "0 auto" }}
         >
           <Card
-            title="Founding member"
-            headline="Free · four months"
-            badge={`First ${FOUNDING_CAP}`}
+            title="Everyone"
+            headline="Free"
+            badge="No card"
             features={[
-              "Unlimited chat with Aura",
-              "Voice sessions when typing is too much",
-              "A seat in circles when they open",
-              "Your record, kept and yours",
+              "Chat with Aura, as much as you need",
+              "Aura remembers you between conversations",
+              "Journal, moods, and goals",
+              "Your record, kept and yours to export",
               "Crisis-aware from message one",
             ]}
-            cta="Take a founding seat"
+            cta="Start talking"
             href="/auth/signup"
             primary
           />
           <Card
-            title="After that"
-            headline="Chat stays free"
+            title="When you want voice or circles"
+            headline={`From $${MIN_SUPPORT}`}
             features={[
-              "Unlimited chat with Aura, always free",
-              "Voice and circles become part of an open space",
-              "Founding members are remembered as founding members",
-              "Prices are shown inside your dashboard, never here",
+              "Tell us honestly how Aura is going — any rating, kept private",
+              "Buy the work a coffee on Ko-fi, whatever it is worth to you",
+              "Voice minutes land on your account and are yours to keep",
+              "A seat in the nightly circles",
+              "One payment. Nothing renews on its own.",
             ]}
-            cta="Start with chat"
+            cta="Start free, unlock later"
             href="/auth/signup"
             primary={false}
           />
         </div>
 
         <p style={{ marginTop: 32, textAlign: "center", fontSize: 13, color: "var(--calm-ink-40)", maxWidth: 560, marginLeft: "auto", marginRight: "auto" }}>
-          Calm Therapist is a place to think out loud with support. It is not a substitute for care
+          Your feedback is never required to be public or positive — an honest low rating opens
+          voice just the same. Calm Therapist is a place to think out loud with support. It is not a substitute for care
           from a licensed professional, and it will always tell you when that is the right next step.
         </p>
       </div>

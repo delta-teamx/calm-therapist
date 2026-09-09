@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 import { getUserById } from "@/lib/users";
-import { accessFor } from "@/lib/access";
+import { accessForUser } from "@/lib/access";
 import { getVoiceQuotaSnapshot, openVoiceSession } from "@/lib/voice-quota";
 import { elevenLabsConfigured, mintSignedUrl } from "@/lib/elevenlabs";
 import { composeSystemPrompt, DEFAULT_PROFILE, UserProfile, AgentModeKey } from "@/lib/aura";
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   const user = await getUserById(claims.sub);
   if (!user) return NextResponse.json({ error: "Account not found" }, { status: 404 });
 
-  const access = accessFor(user);
+  const access = await accessForUser(user);
   if (!access.voice) {
     return NextResponse.json({ error: "Voice is part of an open space.", access }, { status: 403 });
   }

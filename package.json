@@ -17,7 +17,7 @@
     "prebuild": "node scripts/migrate-if-db.js",
     "postbuild": "node scripts/indexnow.js",
     "db:migrate:diff": "prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma --script",
-    "test": "node --experimental-strip-types --test \"tests/**/*.test.ts\""
+    "test": "node --experimental-strip-types --import ./scripts/test-resolver.mjs --test \"tests/**/*.test.ts\""
   },
   "dependencies": {
     "@11labs/react": "^0.0.7",

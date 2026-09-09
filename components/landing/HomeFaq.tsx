@@ -3,12 +3,12 @@ import { JsonLd, faqSchema } from "@/lib/seo";
 import { BRAND } from "@/lib/brand";
 import { CIRCLES_OPEN_AT } from "@/lib/circle-themes";
 
-const CAP = process.env.NEXT_PUBLIC_FOUNDING_CAP ?? "150";
+const MIN_SUPPORT = process.env.NEXT_PUBLIC_MIN_SUPPORT_USD ?? "3";
 
 export const HOME_FAQS = [
   {
     q: "Is this really a free AI therapist?",
-    a: `Yes. Chat with Aura is free for everyone, with no session cap and no card. The first ${CAP} members also get voice and circles free for four months. After that, voice and circles are part of an open space shown inside the app. Chat stays free.`,
+    a: `Yes. Chat with Aura is free for everyone, with no session cap, no trial and no card. Voice and circles are the two parts that cost real money to run, so they open once you tell us how Aura is going and support the work with a one-off coffee, from $${MIN_SUPPORT}. There is no subscription and chat never becomes paid.`,
   },
   {
     q: "Is an AI therapist a replacement for a real therapist?",
@@ -21,6 +21,10 @@ export const HOME_FAQS = [
   {
     q: "What are circles?",
     a: `Small anonymous text rooms of up to eight people carrying the same thing, 45 minutes a night, hosted by Aura with a human on call. You join as an anonymous animal and talk to each other. They open when ${CIRCLES_OPEN_AT} members have joined.`,
+  },
+  {
+    q: "How do I unlock voice and circles?",
+    a: `Two things, both inside your dashboard. First, tell us honestly how Aura has been — any rating, high or low, kept private unless you choose to be quoted. Then buy the work a coffee on Ko-fi, from $${MIN_SUPPORT}, whatever it is worth to you. Voice minutes land on your account and are yours to keep; they do not reset at the end of a month.`,
   },
   {
     q: "Which languages does Aura speak?",

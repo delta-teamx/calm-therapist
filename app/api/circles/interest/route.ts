@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 import { getUserById } from "@/lib/users";
-import { accessFor } from "@/lib/access";
+import { accessForUser } from "@/lib/access";
 import { circleStats, listInterest, setInterest } from "@/lib/circles";
 import { anonymousAnimal } from "@/lib/circle-themes";
 
@@ -22,7 +22,7 @@ export async function GET() {
   return NextResponse.json({
     themes,
     stats,
-    access: accessFor(user),
+    access: await accessForUser(user),
     animal: anonymousAnimal(user.id),
   });
 }
