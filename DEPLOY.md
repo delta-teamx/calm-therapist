@@ -6,7 +6,7 @@ Three services, one origin for the browser.
 |---|---|---|
 | Public site | Netlify | Builds the Next.js app and serves the marketing pages, blog, sitemap, feed. |
 | Backend | Render web service | The same Next.js app, run as Node. Handles `/api/*`, `/dashboard`, `/auth`, `/onboarding`, `/admin`. |
-| Database | Supabase (project `implenix-platform`) | Postgres. Schema applied and baselined for Prisma. |
+| Database | Supabase (project `calm-ai`) | Postgres. Schema applied and baselined for Prisma. |
 | Email cron | Render cron job | Calls `/api/cron/emails` every five minutes with the shared secret. |
 
 Netlify proxies the backend paths to Render with status 200 (see `netlify.toml`), so

@@ -58,8 +58,36 @@ services:
         sync: false
       - key: NEXT_PUBLIC_KOFI_URL
         sync: false
+      # Ko-fi's static webhook token (Ko-fi > Settings > API). Without it
+      # /api/kofi/webhook answers 503 and nobody can unlock voice.
+      - key: KOFI_VERIFICATION_TOKEN
+        sync: false
+      # Public copy reads this to print the minimum ask. Keep the two in step.
+      - key: MIN_SUPPORT_USD
+        value: "3"
+      - key: NEXT_PUBLIC_MIN_SUPPORT_USD
+        value: "3"
+      # Brand and gates. NEXT_PUBLIC_* values are inlined at build time, so
+      # they must be present here before the build runs, not just at runtime.
+      - key: NEXT_PUBLIC_BRAND_NAME
+        sync: false
+      - key: NEXT_PUBLIC_CIRCLES_OPEN_AT
+        value: "50"
+      - key: FOUNDING_MEMBER_CAP
+        value: "150"
+      - key: NEXT_PUBLIC_FOUNDING_CAP
+        value: "150"
+      # Safety: the second classifier pass. Leave CRISIS_LLM_PASS on.
+      - key: SAFETY_MODEL
+        value: gpt-5.4-mini
+      - key: CRISIS_LLM_PASS
+        value: "1"
 
-  # Drains the lifecycle email queue every five minutes.
+  # Drains the lifecycle email queue and re-arms the weekly look-back.
+  # NOTE: the URL below is hardcoded. If Render gives the web service a name
+  # other than "calm-therapist", this silently stops working — no email is
+  # ever sent and nothing errors. Update it, and the seven `to =` lines in
+  # netlify.toml, to match the real service address.
   - type: cron
     name: calm-therapist-emails
     runtime: node
