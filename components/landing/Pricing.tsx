@@ -7,9 +7,11 @@ const MIN_SUPPORT = process.env.NEXT_PUBLIC_MIN_SUPPORT_USD ?? "5";
  * What things cost, said plainly.
  *
  * Chat with Aura is free for everyone with no card and no trial. Voice and
- * circles run on metered providers, so they open on a one-off support pass
- * from $5, which puts minutes on the account that are then owned outright.
- * There is no subscription and nothing renews on its own.
+ * circles run on metered providers, so they open when someone supports the
+ * work, from $5, which puts minutes on the account that are then owned
+ * outright. Ko-fi presents monthly support by default; a single payment is a
+ * switch away, and a monthly one can be cancelled from Ko-fi at any time.
+ * Minutes already granted are never taken back.
  */
 export function Pricing() {
   return (
@@ -21,7 +23,7 @@ export function Pricing() {
           <p className="body-large" style={{ color: "var(--calm-ink-70)" }}>
             No card, no trial, no timer. Voice and circles cost us real money every minute they
             run, so they open when you tell us how it is going and buy the work a coffee —
-            from ${MIN_SUPPORT}, once, not a subscription.
+            from ${MIN_SUPPORT} — monthly on Ko-fi by default, or a single payment if you prefer.
           </p>
         </div>
 
@@ -52,7 +54,7 @@ export function Pricing() {
               "Buy the work a coffee on Ko-fi, whatever it is worth to you",
               "Voice minutes land on your account and are yours to keep",
               "A seat in the nightly circles",
-              "One payment. Nothing renews on its own.",
+              "Cancel monthly support any time — minutes you have are yours to keep",
             ]}
             cta="Start free, unlock later"
             href="/auth/signup"

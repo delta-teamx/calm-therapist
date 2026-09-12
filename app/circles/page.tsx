@@ -6,7 +6,7 @@ import { CIRCLE_MINUTES, CIRCLE_RULES, CIRCLE_SEATS, CIRCLE_THEMES, CIRCLES_OPEN
 
 export const metadata = pageMetadata({
   title: `Circles | Small anonymous groups hosted by Aura | ${BRAND.name}`,
-  description: `Nightly ${CIRCLE_MINUTES}-minute text circles of up to ${CIRCLE_SEATS} people who carry the same thing. Anonymous animal names, Aura as host, a human on call. Your seat opens with a one-off $5 support pass.`,
+  description: `Nightly ${CIRCLE_MINUTES}-minute text circles of up to ${CIRCLE_SEATS} people who carry the same thing. Anonymous animal names, Aura as host, a human on call. Your seat opens when you support the work, from $5.`,
   path: "/circles",
 });
 
@@ -15,7 +15,7 @@ const FAQS = [
   { q: "Does Aura talk the whole time?", a: "No. Aura opens, keeps time, invites people in, reflects a share back to the room, and stays quiet while members answer each other. Roughly a dozen short messages in a 45-minute circle." },
   { q: "What if someone shares something serious?", a: "Every message passes the same safety check as private chat before it reaches the room. Serious messages are held, the member is shown help privately, and a human moderator is paged. Nobody is left alone with it." },
   { q: "When do circles start?", a: `The night the ${CIRCLES_OPEN_AT}th member has had a session. Until then you can pick the themes you would join, and the first nights are planned from those picks.` },
-  { q: "Is it free?", a: "Chat with Aura is free for everyone, always. A seat in a circle is not: hosting a room costs real money, so a seat opens once you have told us how Aura is going and supported the work with a one-off coffee, from $5. There is no subscription." },
+  { q: "Is it free?", a: "Chat with Aura is free for everyone, always. A seat in a circle is not: hosting a room costs real money, so a seat opens once you have told us how Aura is going and supported the work, from $5. Ko-fi offers monthly support by default and you can switch it to a single payment, or cancel a monthly one at any time from your Ko-fi account. Either way, minutes already on your account stay yours." },
 ];
 
 const NIGHT = [

@@ -45,7 +45,7 @@ export function SupportLink({
       >
         <p className="body-micro" style={{ color: "var(--calm-forest)" }}>Chat is free, always</p>
         <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--calm-ink-70)", margin: 0 }}>
-          Voice and circles run on metered providers, so they open on a one-off support pass from
+          Voice and circles run on metered providers, so they open when you support the work, from
           $5. Sign in first — the unlock happens inside your dashboard, where we can put the
           minutes on your account.
         </p>

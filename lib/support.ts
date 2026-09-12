@@ -439,12 +439,52 @@ export async function ingestKofiPayment(data: KofiWebhookData): Promise<IngestRe
 
   if (amountUsd < MIN_SUPPORT_USD) return { status: "below-minimum", paymentId: id };
 
-  const userId = claimCode ? await userIdForCode(claimCode) : null;
-  if (!userId) return { status: "recorded", paymentId: id };
+  // First payment: the member put their single-use code in the Ko-fi message.
+  const byCode = claimCode ? await userIdForCode(claimCode) : null;
+  if (byCode) {
+    const pass = await attachPayment({ paymentId: id, userId: byCode, amountUsd, currency, matchedBy: "code" });
+    if (claimCode) await consumeCode(claimCode);
+    return { status: "matched", paymentId: id, userId: byCode, pass };
+  }
 
-  const pass = await attachPayment({ paymentId: id, userId, amountUsd, currency, matchedBy: "code" });
-  if (claimCode) await consumeCode(claimCode);
-  return { status: "matched", paymentId: id, userId, pass };
+  // Renewal: Ko-fi's monthly support sends a fresh payment every month, and
+  // the code was spent on the first one. Without this the member keeps paying
+  // and silently stops receiving anything, which is the worst failure this
+  // system can have. Fall back to the email the earlier payment came from.
+  if (data.is_subscription_payment === true) {
+    const owner = await userIdForRecurringEmail(email, id);
+    if (owner) {
+      const pass = await attachPayment({ paymentId: id, userId: owner, amountUsd, currency, matchedBy: "subscription" });
+      return { status: "matched", paymentId: id, userId: owner, pass };
+    }
+  }
+
+  return { status: "recorded", paymentId: id };
+}
+
+/**
+ * The account a recurring payment belongs to, found through an earlier
+ * payment from the same Ko-fi email that was already matched to someone.
+ *
+ * Deliberately narrow. It only runs for payments Ko-fi flags as a
+ * subscription, and it only trusts an email that a *previous* payment already
+ * proved belongs to that account — it never matches a stranger's email
+ * against the user table, because a webhook is a notification, not proof of
+ * who is holding the card.
+ */
+async function userIdForRecurringEmail(email: string | undefined, excludePaymentId: string): Promise<string | null> {
+  if (!email) return null;
+  if (dbEnabled) {
+    const prior = await prisma.kofiPayment.findFirst({
+      where: { email, userId: { not: null }, id: { not: excludePaymentId } },
+      orderBy: { receivedAt: "desc" },
+    });
+    return prior?.userId ?? null;
+  }
+  const prior = Array.from(kofiStore.values())
+    .filter((p) => p.email === email && p.userId && p.id !== excludePaymentId)
+    .sort((a, b) => (a.receivedAt < b.receivedAt ? 1 : -1))[0];
+  return prior?.userId ?? null;
 }
 
 async function attachPayment(input: {

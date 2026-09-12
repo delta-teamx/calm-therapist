@@ -329,3 +329,71 @@ test("every band still resolves, so any amount delivers something", () => {
     assert.ok(tierForAmount(amount), `$${amount} must map to a delivery band`);
   }
 });
+
+/* ---------------------------------------------------------------- */
+/* Monthly support                                                   */
+/* ---------------------------------------------------------------- */
+
+test("a monthly renewal still lands after the code is spent", async () => {
+  // Ko-fi defaults tips to monthly, so this is the common path, not an edge
+  // case. The code is single-use and went on the first payment; every month
+  // after has to find the account some other way or the member pays forever
+  // and receives nothing.
+  const userId = "u-recur";
+  const email = "recurring@example.com";
+  const code = await currentUnlockCode(userId);
+
+  const first = await ingestKofiPayment(
+    payload({ message: code, email, amount: "5.00", is_subscription_payment: true })
+  );
+  assert.equal(first.status, "matched");
+  assert.equal(first.userId, userId);
+
+  const month2 = await ingestKofiPayment(
+    payload({ message: null, email, amount: "5.00", is_subscription_payment: true })
+  );
+  assert.equal(month2.status, "matched", "the renewal must find the account");
+  assert.equal(month2.userId, userId);
+
+  const snap = await getVoiceQuotaSnapshot(userId, accessFor(MEMBER, month2.pass ?? null));
+  assert.equal(snap.balanceSec, 30 * 60, "two months of support is two lots of minutes");
+});
+
+test("each renewal pushes the circles expiry further out", async () => {
+  const userId = "u-recur-2";
+  const email = "recurring2@example.com";
+  const code = await currentUnlockCode(userId);
+  const first = await ingestKofiPayment(
+    payload({ message: code, email, amount: "5.00", is_subscription_payment: true })
+  );
+  const second = await ingestKofiPayment(
+    payload({ message: null, email, amount: "5.00", is_subscription_payment: true })
+  );
+  assert.ok(first.pass && second.pass);
+  assert.ok(new Date(second.pass.expiresAt) > new Date(first.pass.expiresAt));
+});
+
+test("a one-off payment never matches by email alone", async () => {
+  // Only Ko-fi-flagged subscription payments get the email fallback. A
+  // webhook is a notification, not proof of who is holding the card, so a
+  // stranger quoting a known email must not inherit that account.
+  const userId = "u-oneoff";
+  const email = "oneoff@example.com";
+  const code = await currentUnlockCode(userId);
+  assert.equal(
+    (await ingestKofiPayment(payload({ message: code, email, amount: "5.00" }))).status,
+    "matched"
+  );
+
+  const stranger = await ingestKofiPayment(payload({ message: null, email, amount: "5.00" }));
+  assert.equal(stranger.status, "recorded", "no code, not a renewal: it waits to be claimed");
+  assert.equal(stranger.userId, undefined);
+});
+
+test("a renewal from an unknown email is recorded, not guessed at", async () => {
+  const res = await ingestKofiPayment(
+    payload({ message: null, email: "never-seen@example.com", amount: "5.00", is_subscription_payment: true })
+  );
+  assert.equal(res.status, "recorded");
+  assert.equal(res.userId, undefined);
+});

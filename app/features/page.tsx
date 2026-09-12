@@ -20,7 +20,7 @@ export default function FeaturesIndex() {
           </p>
           <h1 style={{ marginBottom: 24 }}>One memory. Every way in.</h1>
           <p className="body-large" style={{ color: "var(--calm-ink-70)", marginBottom: 40 }}>
-            Chat is free for everyone, always. Voice and circles open with a one-off support pass
+            Chat is free for everyone, always. Voice and circles open when you support the work,
             from $5. Everything shares one memory, so what you said in voice is there in next
             week&apos;s journal.
           </p>

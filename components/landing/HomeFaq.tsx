@@ -8,7 +8,7 @@ const MIN_SUPPORT = process.env.NEXT_PUBLIC_MIN_SUPPORT_USD ?? "5";
 export const HOME_FAQS = [
   {
     q: "Is this really a free AI therapist?",
-    a: `Yes. Chat with Aura is free for everyone, with no session cap, no trial and no card. Voice and circles are the two parts that cost real money to run, so they open once you tell us how Aura is going and support the work with a one-off coffee, from $${MIN_SUPPORT}. There is no subscription and chat never becomes paid.`,
+    a: `Yes. Chat with Aura is free for everyone, with no session cap, no trial and no card. Voice and circles are the two parts that cost real money to run, so they open once you tell us how Aura is going and support the work, from $${MIN_SUPPORT}. Ko-fi shows monthly support by default; you can switch to a single payment, or cancel a monthly one at any time from your Ko-fi account. Chat never becomes paid either way.`,
   },
   {
     q: "Is an AI therapist a replacement for a real therapist?",
@@ -24,7 +24,7 @@ export const HOME_FAQS = [
   },
   {
     q: "How do I unlock voice and circles?",
-    a: `Two things, both inside your dashboard. First, tell us honestly how Aura has been — any rating, high or low, kept private unless you choose to be quoted. Then buy the work a coffee on Ko-fi, from $${MIN_SUPPORT}, whatever it is worth to you. Voice minutes land on your account and are yours to keep; they do not reset at the end of a month.`,
+    a: `Two things, both inside your dashboard. First, tell us honestly how Aura has been — any rating, high or low, kept private unless you choose to be quoted. Then buy the work a coffee on Ko-fi, from $${MIN_SUPPORT}, whatever it is worth to you. Ko-fi defaults to monthly support — keep it if you want minutes topped up each month, or switch it to a single payment. Voice minutes land on your account and are yours to keep; they do not reset, and cancelling never takes back minutes you already have.`,
   },
   {
     q: "Which languages does Aura speak?",

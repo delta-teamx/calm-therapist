@@ -354,8 +354,14 @@ function SupportStep({ state, onDone }: { state: UnlockState; onDone: () => Prom
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <p style={{ fontSize: 14, color: "var(--calm-ink-70)", margin: 0 }}>
         Buy the creator a coffee — anything from ${state.minUsd}, whatever this has been worth to
-        you. There is no plan to pick and nothing to cancel. The more you can give, the more voice
-        we can afford to put on your account, and those minutes are then yours to keep.
+        you. There is no plan to pick. The more you can give, the more voice we can afford to put
+        on your account, and those minutes are then yours to keep.
+      </p>
+
+      <p style={{ fontSize: 13, color: "var(--calm-ink-40)", margin: 0, lineHeight: 1.6 }}>
+        Ko-fi shows monthly support first. Keep it and your minutes are topped up each month, or
+        switch it to a single payment on their page — both work. You can cancel a monthly one any
+        time from Ko-fi, and cancelling never takes back minutes you already have.
       </p>
 
       {state.code && (

@@ -67,12 +67,20 @@ export default function TermsPage() {
             </p>
             <p>
               Voice and circles are metered services that cost us money per minute, so they open on
-              a <strong>support pass</strong>: a one-off payment from $5, processed by Ko-fi. What
-              you pay determines how many voice minutes are added to your account and how long your
-              circles seat stays open; both are shown in{" "}
+              a <strong>support pass</strong>, from $5, processed by Ko-fi. What you pay determines
+              how many voice minutes are added to your account and how long your circles seat stays
+              open; both are shown in{" "}
               <Link href="/dashboard/settings" style={{ color: "var(--calm-forest)" }}>Settings</Link>.
-              Voice minutes are yours outright and do not expire at the end of a month. A support
-              pass is a one-time purchase — nothing renews, and we never store your card.
+              Voice minutes are yours outright and do not expire at the end of a month.
+            </p>
+            <p>
+              <strong>Ko-fi presents support as monthly by default.</strong> You can choose a single
+              payment instead at the time of paying. If you do leave it monthly, Ko-fi charges you
+              again each month and each charge adds another set of voice minutes and extends your
+              circles seat. You can cancel at any time from your own Ko-fi account, and we will
+              cancel it for you on request. Cancelling stops future charges; it never removes voice
+              minutes already on your account, which remain yours. We never see or store your card
+              details — Ko-fi and its payment processor handle that entirely.
             </p>
             <p>
               We also ask you to tell us how Aura has been before a pass is issued. Any rating opens

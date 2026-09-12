@@ -239,7 +239,8 @@ function Membership({ me }: { me: Me | null }) {
         {me.access.voice && (
           <p style={{ fontSize: 12, color: "var(--calm-ink-40)", margin: 0 }}>
             Minutes are yours outright and never reset. They are counted from the call itself,
-            after it ends.
+            after it ends. If you set up monthly support on Ko-fi, you can cancel it any time from
+            your Ko-fi account — the minutes you already have stay yours.
           </p>
         )}
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
