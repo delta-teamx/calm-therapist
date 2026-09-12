@@ -62,8 +62,8 @@ export const SUPPORT_TIERS: SupportTier[] = [
   {
     key: "coffee",
     label: "A coffee",
-    minUsd: 3,
-    suggestUsd: 3,
+    minUsd: 5,
+    suggestUsd: 5,
     voiceMinutes: Number(process.env.SUPPORT_MINUTES_COFFEE ?? 15),
     months: 1,
     blurb: "15 minutes of voice, and circles for a month.",
@@ -98,7 +98,7 @@ export const SUPPORT_TIERS: SupportTier[] = [
 ];
 
 /** Below this, we say thank you and record it, but no pass is created. */
-export const MIN_SUPPORT_USD = Number(process.env.MIN_SUPPORT_USD ?? 3);
+export const MIN_SUPPORT_USD = Number(process.env.MIN_SUPPORT_USD ?? 5);
 
 export function tierForAmount(amountUsd: number): SupportTier | null {
   if (!Number.isFinite(amountUsd) || amountUsd < MIN_SUPPORT_USD) return null;

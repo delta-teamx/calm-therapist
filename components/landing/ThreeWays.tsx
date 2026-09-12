@@ -12,7 +12,7 @@ const WAYS = [
     cta: "How chat works",
   },
   {
-    eyebrow: "Voice · opens from $3",
+    eyebrow: "Voice · opens from $5",
     title: "Talk to Aura",
     body: "When typing is too much. Shorter turns, slower pace, the same memory. Minutes land on your account when you support the work, and they are yours to keep.",
     href: "/features/voice",

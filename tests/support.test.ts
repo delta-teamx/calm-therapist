@@ -41,7 +41,7 @@ test("tiers are ordered and start at the advertised minimum", () => {
 });
 
 test("an amount maps to the highest tier it clears", () => {
-  assert.equal(tierForAmount(3)?.key, "coffee");
+  assert.equal(tierForAmount(5)?.key, "coffee");
   assert.equal(tierForAmount(7.5)?.key, "coffee", "between tiers rounds down, never up");
   assert.equal(tierForAmount(10)?.key, "supporter");
   assert.equal(tierForAmount(25)?.key, "patron");
@@ -50,7 +50,7 @@ test("an amount maps to the highest tier it clears", () => {
 });
 
 test("anything under the minimum buys no tier", () => {
-  assert.equal(tierForAmount(2.99), null);
+  assert.equal(tierForAmount(4.99), null);
   assert.equal(tierForAmount(0), null);
   assert.equal(tierForAmount(-5), null);
 });
@@ -127,7 +127,7 @@ test("a live pass opens voice and circles", () => {
     id: "p1",
     userId: "u",
     tierKey: "coffee",
-    amountUsd: 3,
+    amountUsd: 5,
     voiceMinutesGranted: 15,
     circles: true,
     source: "kofi",
@@ -146,7 +146,7 @@ test("an expired pass closes voice and circles again", () => {
     id: "p2",
     userId: "u",
     tierKey: "coffee",
-    amountUsd: 3,
+    amountUsd: 5,
     voiceMinutesGranted: 15,
     circles: true,
     source: "kofi",
@@ -177,8 +177,8 @@ test("a pass puts the tier's minutes on the account", async () => {
 
 test("supporting again extends the end date instead of replacing it", async () => {
   const userId = "u-extend";
-  const first = await grantPass({ userId, amountUsd: 3 });
-  const second = await grantPass({ userId, amountUsd: 3 });
+  const first = await grantPass({ userId, amountUsd: 5 });
+  const second = await grantPass({ userId, amountUsd: 5 });
   assert.ok(first && second);
   assert.ok(
     new Date(second.expiresAt) > new Date(first.expiresAt),
@@ -189,13 +189,13 @@ test("supporting again extends the end date instead of replacing it", async () =
 });
 
 test("an amount below the minimum grants no pass", async () => {
-  assert.equal(await grantPass({ userId: "u-tiny", amountUsd: 1 }), null);
+  assert.equal(await grantPass({ userId: "u-tiny", amountUsd: 4 }), null);
   assert.equal(await activePass("u-tiny"), null);
 });
 
 test("spent minutes come off the balance and never go negative", async () => {
   const userId = "u-spend";
-  const pass = await grantPass({ userId, amountUsd: 3 });
+  const pass = await grantPass({ userId, amountUsd: 5 });
   assert.ok(pass);
   await recordVoiceSeconds(userId, 5 * 60);
   let snap = await getVoiceQuotaSnapshot(userId, accessFor(MEMBER, pass));
@@ -217,7 +217,7 @@ function payload(over: Record<string, unknown> = {}) {
     message_id: `m-${Math.random().toString(36).slice(2)}`,
     type: "Donation",
     from_name: "A supporter",
-    amount: "3.00",
+    amount: "5.00",
     currency: "USD",
     email: "supporter@example.com",
     kofi_transaction_id: `t-${Math.random().toString(36).slice(2)}`,
@@ -269,7 +269,7 @@ test("a payment with no code is recorded and waits", async () => {
 test("a payment under the minimum is kept but buys nothing", async () => {
   const userId = "u-small";
   const code = await currentUnlockCode(userId);
-  const res = await ingestKofiPayment(payload({ message: code, amount: "1.00" }));
+  const res = await ingestKofiPayment(payload({ message: code, amount: "4.00" }));
   assert.equal(res.status, "below-minimum");
   assert.equal(await activePass(userId), null);
 });
@@ -325,7 +325,7 @@ test("the delivery bands are never sent to the browser", async () => {
 test("every band still resolves, so any amount delivers something", () => {
   // The member picks a number, not a band. Whatever they choose above the
   // minimum has to land somewhere.
-  for (const amount of [3, 4.2, 9.99, 10, 17, 25, 33, 50, 120]) {
+  for (const amount of [5, 7.4, 9.99, 10, 17, 25, 33, 50, 120]) {
     assert.ok(tierForAmount(amount), `$${amount} must map to a delivery band`);
   }
 });

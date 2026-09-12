@@ -67,7 +67,7 @@ export default function TermsPage() {
             </p>
             <p>
               Voice and circles are metered services that cost us money per minute, so they open on
-              a <strong>support pass</strong>: a one-off payment from $3, processed by Ko-fi. What
+              a <strong>support pass</strong>: a one-off payment from $5, processed by Ko-fi. What
               you pay determines how many voice minutes are added to your account and how long your
               circles seat stays open; both are shown in{" "}
               <Link href="/dashboard/settings" style={{ color: "var(--calm-forest)" }}>Settings</Link>.

@@ -128,7 +128,7 @@ function NoVoice({ onOpen }: { onOpen: () => void }) {
       <h3>Chat is always free. Talking out loud opens with your support.</h3>
       <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--calm-ink-70)" }}>
         Every voice minute costs us real money at the provider, so voice opens once you have told
-        us how Aura is going and helped cover the bill. From $3. The minutes are then yours to
+        us how Aura is going and helped cover the bill. From $5. The minutes are then yours to
         keep — they do not reset at the end of a month.
       </p>
       <div style={{ display: "flex", gap: 12, marginTop: 12, flexWrap: "wrap" }}>

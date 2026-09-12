@@ -82,7 +82,7 @@ export const PAGES: Record<string, SeoPage> = {
       {
         heading: "What is not free, and why",
         paragraphs: [
-          "Two things are not free: voice, and a seat in the nightly circles. Both are metered — a voice minute costs us real money at the provider the moment it runs — so they open on a one-off support pass from $3. What you give decides how many voice minutes land on your account, and those minutes are yours outright: they do not reset at the end of a month, and nothing renews on its own. Chat is not affected by any of it. We would rather tell you that plainly than take the more common route of a free trial that quietly stops.",
+          "Two things are not free: voice, and a seat in the nightly circles. Both are metered — a voice minute costs us real money at the provider the moment it runs — so they open on a one-off support pass from $5. What you give decides how many voice minutes land on your account, and those minutes are yours outright: they do not reset at the end of a month, and nothing renews on its own. Chat is not affected by any of it. We would rather tell you that plainly than take the more common route of a free trial that quietly stops.",
         ],
       },
       {
@@ -108,7 +108,7 @@ export const PAGES: Record<string, SeoPage> = {
     faqs: [
       { q: "Is the free AI therapist really unlimited?", a: "Yes. Chat with Aura has no session cap and no daily limit. We rate-limit only to stop abuse, at a level no person talking normally will ever reach." },
       { q: "Do I need a card to sign up?", a: "No. An email and a password, or Google sign-in. Nothing is charged, and nothing can be charged, because there is nothing for sale on this site." },
-      { q: "Is there a catch, or a trial that runs out?", a: "No trial and no timer. Chat with Aura is free for everyone indefinitely, with no session cap and no card. The only paid parts are voice and circles, which open on a one-off support pass from $3 — a single payment, not a subscription. You can use the chat for as long as you like without ever paying." },
+      { q: "Is there a catch, or a trial that runs out?", a: "No trial and no timer. Chat with Aura is free for everyone indefinitely, with no session cap and no card. The only paid parts are voice and circles, which open on a one-off support pass from $5 — a single payment, not a subscription. You can use the chat for as long as you like without ever paying." },
       { q: "Is it free in my language?", a: "Yes. Aura works in English, Urdu, Hindi, Arabic, Spanish, and French at no charge, and switches when you do." },
       { q: "Is a free AI therapist safe to use?", a: "Aura runs every message through a safety layer that reads six languages, shows the crisis line for your country when something serious surfaces, and stays careful for the rest of the conversation. She is not an emergency service; for immediate danger, call your local emergency number." },
     ],
@@ -161,7 +161,7 @@ export const PAGES: Record<string, SeoPage> = {
       { q: "Does voice work in my language?", a: "Voice follows the same profile as chat. Quality varies by language and accent; chat is the most reliable place to start in Urdu, Hindi, or Arabic." },
       { q: "Is the crisis line for my country?", a: "Yes. Aura shows the crisis line for the country in your profile, never a default from elsewhere. If you have not set a country, she shows international options and asks." },
       { q: "Does Aura understand cultural context, or just translate?", a: "She reads the profile you give her: family system, diaspora status, stigma, and how you express distress. Advice is adapted to that, not translated from a Western default." },
-      { q: "Is this free?", a: "Chat with Aura is free for everyone, in every supported language, with no session cap and no card. Voice and circles open separately on a one-off support pass from $3." },
+      { q: "Is this free?", a: "Chat with Aura is free for everyone, in every supported language, with no session cap and no card. Voice and circles open separately on a one-off support pass from $5." },
     ],
     related: COMMON_RELATED,
     ctaLine: "Write the first sentence in whichever language it comes in.",
@@ -206,7 +206,7 @@ export const PAGES: Record<string, SeoPage> = {
       { q: "Do I need to sign up to try it?", a: "No. The landing page lets you type one message and get one response with no account. After that, opening a space takes 30 seconds." },
       { q: "Is it private?", a: "Yes. We do not train on your messages. You can export or delete everything anytime." },
       { q: "How is it different from journaling apps?", a: "Calm Therapist actively reflects what you wrote and noticed across sessions. Journaling apps store; Calm Therapist responds." },
-      { q: "Is it free?", a: "Chat with Aura is free for everyone, with no cap and no card. Voice and circles cost real money per minute to run, so they open on a one-off support pass from $3. There is no subscription." },
+      { q: "Is it free?", a: "Chat with Aura is free for everyone, with no cap and no card. Voice and circles cost real money per minute to run, so they open on a one-off support pass from $5. There is no subscription." },
     ],
     related: COMMON_RELATED,
     ctaLine: "Try one sentence on the landing page. No signup screen first.",
@@ -465,7 +465,7 @@ export const PAGES: Record<string, SeoPage> = {
     faqs: [
       { q: "Will Calm Therapist wake me up with notifications?", a: "Only if you've asked us to. Default is silent." },
       { q: "Can it help me actually fall asleep?", a: "Indirectly — by helping you put the thought down. We don't pretend to be a sleep app." },
-      { q: "Is it free at night?", a: "Yes. Chat is free at any hour, with nothing that expires at 3am and no upgrade prompt in the middle of a hard night. Voice and circles are the only paid parts, and they open on a one-off $3 support pass whenever you want them." },
+      { q: "Is it free at night?", a: "Yes. Chat is free at any hour, with nothing that expires at 3am and no upgrade prompt in the middle of a hard night. Voice and circles are the only paid parts, and they open on a one-off $5 support pass whenever you want them." },
     ],
     related: COMMON_RELATED,
     ctaLine: "If it's late and the thought won't stop — try one sentence.",
@@ -489,7 +489,7 @@ export const PAGES: Record<string, SeoPage> = {
       {
         heading: "What Aura is",
         paragraphs: [
-          "Aura is a free AI therapist built on a general language model with a written therapeutic stance rather than a decision tree. She remembers your name, your sister's name, the argument from last Tuesday, and what helped before. She replies in two or three sentences, asks one question at most, and pushes back when you are being unfair to yourself. Chat is free for everyone with no session cap. Voice and circles open on a one-off support pass from $3.",
+          "Aura is a free AI therapist built on a general language model with a written therapeutic stance rather than a decision tree. She remembers your name, your sister's name, the argument from last Tuesday, and what helped before. She replies in two or three sentences, asks one question at most, and pushes back when you are being unfair to yourself. Chat is free for everyone with no session cap. Voice and circles open on a one-off support pass from $5.",
         ],
         bullets: [
           "Memory across every conversation, on any device",
@@ -519,7 +519,7 @@ export const PAGES: Record<string, SeoPage> = {
       },
     ],
     faqs: [
-      { q: "Is Wysa free?", a: "Wysa's core scripted chatbot is free. The premium tools and human coaching are paid. Aura's chat is free with no cap; voice and circles open on a one-off support pass from $3, with no subscription." },
+      { q: "Is Wysa free?", a: "Wysa's core scripted chatbot is free. The premium tools and human coaching are paid. Aura's chat is free with no cap; voice and circles open on a one-off support pass from $5, with no subscription." },
       { q: "Does Wysa remember previous conversations?", a: "Not in the way people expect. Reviews consistently cite missing memory. Aura stores your profile and memories on the server and carries them into every conversation." },
       { q: "Does Wysa work in Urdu?", a: "Wysa's bot does not; Urdu is available only via its human coaches. Aura replies in Urdu, including Roman Urdu, directly." },
       { q: "Which is safer?", a: "Both have crisis detection. Aura runs a two-layer safety check in six languages before every reply and attaches the crisis line for your country. Wysa was rated unacceptable for teens by Common Sense Media in 2026; Aura is for adults." },
@@ -573,7 +573,7 @@ export const PAGES: Record<string, SeoPage> = {
     faqs: [
       { q: "Why did Woebot shut down?", a: "Woebot Health closed its consumer app on 30 June 2025 and refocused on enterprise and clinical work. Its founder cited regulation lagging behind the technology." },
       { q: "Is Aura like Woebot?", a: "In shape, yes: short, daily, text-first. In substance, Aura is conversational rather than scripted, remembers you, and works in six languages." },
-      { q: "Is Aura free?", a: "Chat is free for everyone with no cap and no card. Voice and circles open on a one-off support pass from $3." },
+      { q: "Is Aura free?", a: "Chat is free for everyone with no cap and no card. Voice and circles open on a one-off support pass from $5." },
       { q: "Can I bring my Woebot data?", a: "There is no importer. Tell Aura what matters in your first conversation, or add memories from your space." },
       { q: "Is Aura safe in a crisis?", a: "Aura runs a two-layer safety check before every reply, shows the crisis line for your country, and stays careful for the rest of the conversation. She is not an emergency service." },
     ],
@@ -593,7 +593,7 @@ export const PAGES: Record<string, SeoPage> = {
       {
         heading: "The three complaints, and how Aura answers them",
         paragraphs: [
-          "Paywall mid-conversation: Aura's chat is free for everyone with no session cap and no upgrade prompt inside a conversation, ever. Voice and circles are the only things that carry a price, they are asked for in your dashboard rather than sprung on you at a hard moment, and they are a single $3 payment rather than a subscription that keeps taking.",
+          "Paywall mid-conversation: Aura's chat is free for everyone with no session cap and no upgrade prompt inside a conversation, ever. Voice and circles are the only things that carry a price, they are asked for in your dashboard rather than sprung on you at a hard moment, and they are a single $5 payment rather than a subscription that keeps taking.",
           "No memory: Aura stores your profile and memories on the server and reads them before every reply. She does not re-ask what you told her last week.",
           "English only: Aura works in English, Urdu, Hindi, Arabic, Spanish, and French, including Roman Urdu and Hinglish, and switches mid-sentence when you do.",
         ],
@@ -619,7 +619,7 @@ export const PAGES: Record<string, SeoPage> = {
     ],
     faqs: [
       { q: "When does Youper shut down?", a: "Youper has announced a closing date of 30 September 2026." },
-      { q: "Is Aura a paid app?", a: "No. Chat is free, always, with no session cap. Voice and circles open on a one-off support pass from $3 — one payment, nothing recurring, and never asked for inside a conversation." },
+      { q: "Is Aura a paid app?", a: "No. Chat is free, always, with no session cap. Voice and circles open on a one-off support pass from $5 — one payment, nothing recurring, and never asked for inside a conversation." },
       { q: "Does Aura remember me?", a: "Yes. Profile, goals, and memories are stored on the server and used in every reply." },
       { q: "Does Aura track mood?", a: "There is a daily check-in in the dashboard. Aura is primarily a conversation, not a tracker." },
       { q: "Is there an Android or iPhone app?", a: "Aura is a web app that installs to your home screen from the browser. Store apps come once members have rated the product." },

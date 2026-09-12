@@ -64,9 +64,9 @@ services:
         sync: false
       # Public copy reads this to print the minimum ask. Keep the two in step.
       - key: MIN_SUPPORT_USD
-        value: "3"
+        value: "5"
       - key: NEXT_PUBLIC_MIN_SUPPORT_USD
-        value: "3"
+        value: "5"
       # Brand and gates. NEXT_PUBLIC_* values are inlined at build time, so
       # they must be present here before the build runs, not just at runtime.
       - key: NEXT_PUBLIC_BRAND_NAME

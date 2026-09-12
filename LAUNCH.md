@@ -119,7 +119,7 @@ FREE_CHAT_MESSAGES_PER_DAY   120   fair-use cap on free chat, not a paywall
 FREE_JOURNAL_READS_PER_WEEK  3     LLM-backed journal reads
 FOUNDING_MEMBER_CAP          150   badge only; grants no access
 MIN_SUPPORT_USD              3
-SUPPORT_MINUTES_COFFEE       15    delivered for $3 and up
+SUPPORT_MINUTES_COFFEE       15    delivered for $5 and up
 SUPPORT_MINUTES_SUPPORTER    60    delivered for $10 and up
 SUPPORT_MINUTES_PATRON       150   delivered for $25 and up
 SUPPORT_MINUTES_FOUNDER      300   delivered for $50 and up
@@ -127,7 +127,7 @@ SUPPORT_MINUTES_FOUNDER      300   delivered for $50 and up
 
 **These bands are server-side only and are never shown to a member.** Nobody
 picks one. The popup makes a single open ask — buy the creator a coffee, from
-$3, whatever it has been worth to you — and the bands are only how the server
+$5, whatever it has been worth to you — and the bands are only how the server
 decides what voice package to deliver once the money has arrived. A test
 asserts the band table never reaches the API response or the dialog, because
 the moment a member sees a ladder the ask stops being an ask and becomes a
@@ -169,7 +169,7 @@ member opens voice or circles
         |                      never required.
         |
         └─ gate 2 ──> GET /api/unlock issues a single-use code (AURA-XXXXXX)
-                      one ask, no plan to pick: any amount from $3
+                      one ask, no plan to pick: any amount from $5
                       member pastes the code into the Ko-fi message and pays
                               |
                               v
@@ -245,7 +245,7 @@ in spam.
 - [ ] Send a message to Aura; confirm the reply streams and a memory is written
 - [ ] Type a crisis phrase; confirm the hotline for your country appears
 - [ ] Open the unlock dialog: leave a 1-star review; confirm the gate opens anyway
-- [ ] Send yourself $3 on Ko-fi with the code in the message
+- [ ] Send yourself $5 on Ko-fi with the code in the message
 - [ ] Confirm the pass appears in Settings and voice minutes land on the account
 - [ ] Confirm the "Thank you — voice is open" receipt arrives
 - [ ] Send the same webhook twice (Ko-fi's "test" button) and confirm no double grant
@@ -262,7 +262,7 @@ intangible benefits beyond personal satisfaction." Unlocking a feature in
 exchange for a plain tip sits badly against that — and note that presenting no
 price ladder in the UI, which is what we do, helps the framing but does not by
 itself resolve it, because a benefit is still delivered. The fix inside Ko-fi
-is to sell a **Shop item, Pay What You Want, minimum $3, digital** rather than
+is to sell a **Shop item, Pay What You Want, minimum $5, digital** rather than
 take a tip; that is still a single open "pay what you want" ask to the member,
 so nothing about the popup changes. The webhook already handles Shop orders,
 since it reads `amount` and `message` the same way. Also check Ko-fi's "Contributor" setting, which is

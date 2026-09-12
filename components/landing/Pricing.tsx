@@ -1,14 +1,14 @@
 import { Style } from "@/components/ui/Style";
 import Link from "next/link";
 
-const MIN_SUPPORT = process.env.NEXT_PUBLIC_MIN_SUPPORT_USD ?? "3";
+const MIN_SUPPORT = process.env.NEXT_PUBLIC_MIN_SUPPORT_USD ?? "5";
 
 /**
  * What things cost, said plainly.
  *
  * Chat with Aura is free for everyone with no card and no trial. Voice and
  * circles run on metered providers, so they open on a one-off support pass
- * from $3, which puts minutes on the account that are then owned outright.
+ * from $5, which puts minutes on the account that are then owned outright.
  * There is no subscription and nothing renews on its own.
  */
 export function Pricing() {

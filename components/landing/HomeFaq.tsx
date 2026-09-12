@@ -3,7 +3,7 @@ import { JsonLd, faqSchema } from "@/lib/seo";
 import { BRAND } from "@/lib/brand";
 import { CIRCLES_OPEN_AT } from "@/lib/circle-themes";
 
-const MIN_SUPPORT = process.env.NEXT_PUBLIC_MIN_SUPPORT_USD ?? "3";
+const MIN_SUPPORT = process.env.NEXT_PUBLIC_MIN_SUPPORT_USD ?? "5";
 
 export const HOME_FAQS = [
   {

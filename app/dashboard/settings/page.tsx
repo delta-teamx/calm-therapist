@@ -250,7 +250,7 @@ function Membership({ me }: { me: Me | null }) {
         {me.access.tier === "member" && (
           <p style={{ fontSize: 14, color: "var(--calm-ink-70)", lineHeight: 1.7, margin: 0 }}>
             Chat stays free whatever you decide. Voice and circles open after two small things:
-            telling us honestly how Aura is going, and buying the work a coffee — from $3, once,
+            telling us honestly how Aura is going, and buying the work a coffee — from $5, once,
             never a subscription.
           </p>
         )}

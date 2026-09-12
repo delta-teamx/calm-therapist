@@ -89,7 +89,7 @@ export default function CirclesDashboardPage() {
         <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--calm-ink-70)", marginTop: 16 }}>
           {data?.access.circles
             ? "Your seat is held. When circles open, Aura invites you to the nights that match the themes you pick below."
-            : "A seat in a circle opens when you have told us how Aura is going and supported the work, from $3. Pick your themes either way; that is how the first nights get planned."}
+            : "A seat in a circle opens when you have told us how Aura is going and supported the work, from $5. Pick your themes either way; that is how the first nights get planned."}
         </p>
         {data && !data.access.circles && (
           <button type="button" className="btn-primary" style={{ marginTop: 16 }} onClick={() => setUnlockOpen(true)}>
